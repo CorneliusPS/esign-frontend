@@ -1,0 +1,255 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+      <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+          <div class="my-2">
+            <button
+              pButton
+              pRipple
+              label="Add Request"
+              icon="pi pi-plus"
+              class="p-button-success mr-2"
+              (click)="openNew()"
+            ></button>
+          </div>
+        </ng-template>
+      </p-toolbar>
+
+      <p-table
+        #dt
+        [value]="documents"
+        responsiveLayout="scroll"
+        [rows]="10"
+        [globalFilterFields]="['fileName', 'documentStatus', 'signed']"
+        [paginator]="true"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [(selection)]="selectedDocuments"
+        selectionMode="multiple"
+        [rowHover]="true"
+        dataKey="idDocument"
+      >
+        <ng-template pTemplate="caption">
+          <div
+            class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+          >
+            <h5 class="m-0">List Request</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="onGlobalFilter($event, dt)"
+                placeholder="Search..."
+                class="w-full sm:w-auto"
+              />
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <!-- <th style="width: 0.5rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th> -->
+            <th pSortableColumn="fileName">
+              File Name <p-sortIcon field="fileName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="status">
+              Status <p-sortIcon field="status"></p-sortIcon>
+            </th>
+            <th pSortableColumn="signed">
+              Signature Status <p-sortIcon field="signed"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-document>
+          <tr>
+            <!-- <td><p-tableCheckbox [value]="document"></p-tableCheckbox></td> -->
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">File Name</span
+              >{{ document.fileName }}
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">Status</span
+              >{{ document.documentStatus }}
+            </td>
+            <td style="width: 14%; min-width: 10rem">
+              <span class="p-column-title">Signature Status</span
+              >{{ document.signed }}
+            </td>
+            <!-- <td>
+              <div class="flex">
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-success mr-2"
+                  (click)="documentDialog = true"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-warning"
+                  (click)="deleteDocumentDialog = true"
+                ></button>
+              </div>
+            </td> -->
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <p-dialog
+      [(visible)]="documentDialog"
+      [style]="{ width: '450px' }"
+      header="Add Request Signature"
+      [modal]="true"
+      class="p-grid p-fluid"
+    >
+      <ng-template pTemplate="content">
+        <div class="field form-group">
+          <label for="distributionType" class="font-semibold"
+            >Document Name</label
+          >
+          <div class="mt-1"></div>
+          <input
+            id="documentName"
+            name="documentName"
+            type="text"
+            pInputText
+            [(ngModel)]="documentName"
+          />
+        </div>
+        <div class="field form-group">
+          <label for="pdfDocument" class="font-semibold">Select File</label>
+          <div class="mt-1"></div>
+          <p-button
+            label="Choose File"
+            icon="pi pi-upload"
+            (click)="fileInput.click()"
+          ></p-button>
+          <input
+            type="file"
+            #fileInput
+            style="display: none"
+            id="pdfDocument"
+            name="pdfDocument"
+            accept=".pdf"
+            (change)="onUpload($event)"
+          />
+          <div *ngIf="postDocument.fileData">
+            <iframe
+              [src]="
+                sanitizer.bypassSecurityTrustResourceUrl(
+                  'data:application/pdf;base64,' + postDocument.fileData
+                )
+              "
+              width="100%"
+              height="500px"
+              class="shadow-4"
+            ></iframe>
+          </div>
+        </div>
+
+        <div class="field form-group mt-2">
+          <label for="approver-form" class="font-semibold">Add Approver</label>
+          <div
+            *ngFor="let approver of selectedApprovers; let i = index"
+            class="approver-row"
+          >
+            <div class="approver-input">
+              <p-autoComplete
+                [(ngModel)]="selectedApprovers[i]"
+                [suggestions]="filteredApprovers"
+                (completeMethod)="filterApprover($event)"
+                id="approver-form"
+                field="fullName"
+                [dropdown]="true"
+                appendTo="body"
+              ></p-autoComplete>
+            </div>
+            <div class="approver-remove">
+              <button
+                pButton
+                icon="pi pi-times"
+                class="p-button-danger p-button-rounded p-button-icon-only"
+                (click)="removeApprover(approver)"
+              ></button>
+            </div>
+          </div>
+          <div class="approver-add">
+            <p-autoComplete
+              [(ngModel)]="selectedApprover"
+              [suggestions]="filteredApprovers"
+              (completeMethod)="filterApprover($event)"
+              field="fullName"
+              [dropdown]="true"
+              appendTo="body"
+            ></p-autoComplete>
+            <button
+              pButton
+              label="Add Approver"
+              (click)="addApprover()"
+              class="p-button-success"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="hideDialog()"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="saveDocument()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog
+      [(visible)]="deleteDocumentDialog"
+      header="Confirm"
+      [modal]="true"
+      [style]="{ width: '450px' }"
+    >
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span
+          >Are you sure you want to delete <b>{{ document.documentName }}</b
+          >?</span
+        >
+      </div>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          icon="pi pi-times"
+          class="p-button-text"
+          label="No"
+          (click)="deleteDocumentDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          icon="pi pi-check"
+          class="p-button-text"
+          label="Yes"
+          (click)="deleteDocumentDialog = false"
+        ></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

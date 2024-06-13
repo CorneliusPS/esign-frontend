@@ -1,0 +1,43 @@
+<div class="card mb-3">
+  <div class="spinner-container" *ngIf="progressSpinnerVisible">
+    <p-progressSpinner ariaLabel="loading" styleClass="custom-spinner"></p-progressSpinner>
+  </div>
+
+  <p-toast></p-toast>
+
+  <div>
+    <h4 class="mb-3">Form Pengajuan Permintaan Barang</h4>
+    <hr>
+    <div class="form-group">
+      <h6 class="mt-5 mb-4">Nama Barang</h6>
+      <span class="p-float-label">
+        <input class="form-control" id="float-input" type="text" pInputText [(ngModel)]="postPermintaanBarang!.namaBarang">
+        <label for="float-input">Nama barang</label>
+      </span>
+    </div>
+
+    <div class="form-group">
+      <h6 class="mt-5 mb-4">Deskripsi Barang</h6>
+      <textarea class="form-control" rows="5" cols="30" placeholder="Deskripsi barang" pInputTextarea [(ngModel)]="postPermintaanBarang!.deskripsiBarang"></textarea>
+    </div>
+
+    <div class="form-group">
+      <h6 class="mt-5 mb-4">Jumlah Barang</h6>
+      <p-inputNumber class="form-control" mode="decimal" [showButtons]="true" [min]="0" [(ngModel)]="postPermintaanBarang!.jumlahPermintaan"></p-inputNumber>
+    </div>
+
+    <div class="form-group">
+      <h6 class="mt-5 mb-4">Tanggal Permintaan</h6>
+      <p-calendar class="form-control" id="tanggalPeminjaman" dateFormat="yy-mm-dd" [showIcon]="true" [(ngModel)]="postPermintaanBarang!.tanggalPermintaan"></p-calendar>
+    </div>
+
+    <div class="form-group">
+      <h6 class="mt-5 mb-4">Upload Dokumen</h6>
+      <input class="form-control form-ctl" name="filePermintaan" type="file" id="filePermintaan" required="" accept=".pdf,.docx,.doc" (change)="onUpload($event)">
+    </div>
+
+    <div class="text-right mt-8">
+      <button pButton pRipple label="Submit" icon="pi pi-save" (click)="submitPermintaan()"></button>
+    </div>
+  </div>
+</div>

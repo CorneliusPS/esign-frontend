@@ -1,0 +1,117 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+
+      <p-table #dt [value]="peminjamanBarangs" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['user.email','user.noHp','ltBarang[0].kodeBarang','namaBarang','statusPeminjaman','tanggalPeminjaman','tanggalPengambilan','catatanAdmin']" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedPeminjamanBarangs" selectionMode="multiple" [rowHover]="true" dataKey="idPeminjamanBarang">
+        <ng-template pTemplate="caption">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 class="m-0">Manage Peminjaman Barang</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="nomorKategori">No </th>
+            <th pSortableColumn="user.email">Email <p-sortIcon field="user.email"></p-sortIcon></th>
+            <th pSortableColumn="user.noHp">No Hp <p-sortIcon field="user.noHp"></p-sortIcon></th>
+            <th pSortableColumn="ltBarang[0].kodeBarang">Kode Barang <p-sortIcon field="ltBarang[0].kodeBarang"></p-sortIcon></th>
+            <th pSortableColumn="namaBarang">Nama Barang <p-sortIcon field="namaBarang"></p-sortIcon></th>
+            <th pSortableColumn="imageBarang">Foto Barang <p-sortIcon field="imageBarang"></p-sortIcon></th>
+            <th pSortableColumn="tanggalPeminjaman">Tanggal Peminjaman <p-sortIcon field="tanggalPeminjaman"></p-sortIcon></th>
+            <th pSortableColumn="tanggalPengambilan">Tanggal Pengembalian  <p-sortIcon field="tanggalPengambilan"></p-sortIcon></th>
+            <th pSortableColumn="statusPeminjaman">Status Peminjaman <p-sortIcon field="statusPeminjaman"></p-sortIcon></th>
+            <th pSortableColumn="jumlahPeminjaman">Jumlah Peminjaman <p-sortIcon field="jumlahPeminjaman"></p-sortIcon></th>
+            <th pSortableColumn="catatanAdmin">Catatan Admin <p-sortIcon field="catatanAdmin"></p-sortIcon></th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-peminjamanBarang let-i="rowIndex">
+          <tr>
+            <td style="width:10%; min-width:7rem;">{{i + 1}}</td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Email</span>
+              {{peminjamanBarang.user.email.toString()}}
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">No Hp</span>
+              {{peminjamanBarang.user.noHp}}
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Kode Barang</span>
+              {{peminjamanBarang.ltBarang[0].kodeBarang}}
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Nama Barang</span>
+              {{peminjamanBarang.ltBarang[0].namaBarang}}
+            </td>
+            <td style="width:10%; min-width:10rem;">
+              <span class="p-column-title">Foto Barang</span>
+              <p-image [src]="peminjamanBarang.ltBarang[0].imageBarang" [alt]="peminjamanBarang.ltBarang.namaBarang" width="70" class="shadow-4" [preview]="true"></p-image>
+            </td>
+            <td style="width:20%; min-width:15rem;">
+              <span class="p-column-title">Tanggal Peminjaman</span>
+              {{peminjamanBarang.tanggalPeminjaman | date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td style="width:20%; min-width:15rem;">
+              <span class="p-column-title">Tanggal Pengembalian</span>
+              {{peminjamanBarang.tanggalPengambilan | date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td style="width:20%; min-width: 15rem;">
+              <span class="p-column-title">Status</span>
+              <span [ngClass]="getStatusBadgeClass(peminjamanBarang.statusPeminjaman)">{{peminjamanBarang.statusPeminjaman}}</span>
+            </td>
+            <td style="width:10%; min-width:15rem;">
+              <span class="p-column-title">Jumlah Peminjaman</span>
+              {{peminjamanBarang.jumlahPeminjaman}}
+            </td>
+            <td style="width:10%; min-width: 13rem;">
+              <span class="p-column-title">Catatan Admin</span>
+              {{peminjamanBarang.catatanAdmin}}
+            </td>
+            <td>
+              <div class="flex">
+                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editPeminjamanBarang(peminjamanBarang)"></button>
+                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deletePeminjamanBarang(peminjamanBarang)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+
+    <p-dialog [(visible)]="peminjamanDialog" [style]="{width: '450px'}" header="Peminjaman Barang Details" [modal]="true" class="p-fluid" (onHide)="hideDialog()"
+    >
+
+      <ng-template pTemplate="content">
+          <div class="form-group field">
+            <label for="catatanAdmin">Catatan Admin</label>
+            <textarea id="catatanAdmin" pInputTextarea [(ngModel)]="accRejPeminjamanBarang.catatanAdmin" required rows="3" cols="20"></textarea>
+          </div>
+      </ng-template>
+
+
+      <ng-template pTemplate="footer">
+        <button pButton pRipple label="Tolak" icon="pi pi-times" class="p-button-text" (click)="rejPeminjaman()"></button>
+        <button pButton pRipple label="Terima" icon="pi pi-check" class="p-button-text" (click)="accPeminjaman()"></button>
+      </ng-template>
+
+    </p-dialog>
+
+
+    <p-dialog [(visible)]="deletePeminjamanDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="peminjamanBarang">Are you sure you want to delete?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deletePeminjamanDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

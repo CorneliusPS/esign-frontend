@@ -1,0 +1,26 @@
+.approver-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.approver-input {
+  flex-grow: 1;
+  margin-right: 0.5rem;
+}
+
+.approver-remove {
+  flex-shrink: 0;
+}
+
+.approver-add {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.approver-add p-autoComplete {
+  flex-grow: 1;
+  flex-basis: 70%;
+  margin-right: 0.5rem;
+}

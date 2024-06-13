@@ -1,0 +1,125 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+
+      <p-table #dt [value]="peminjamanBarangs" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['kodeBarang','namaBarang','hargaBarang','stokBarang','statusBarang', 'kategoriBarang']" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedBarangs" selectionMode="multiple" [rowHover]="true" dataKey="id">
+        <ng-template pTemplate="caption">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 class="m-0">Pengajuan Peminjaman Barang</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="nomorKategori">No </th>
+            <th>Nama Barang</th>
+            <th pSortableColumn="statusPeminjaman">Status <p-sortIcon field="statusPeminjaman"></p-sortIcon></th>
+            <th pSortableColumn="jumlahPeminjaman">Jumlah Peminjaman <p-sortIcon field="jumlahPeminjaman"></p-sortIcon></th>
+            <th pSortableColumn="tanggalPeminjaman">Tanggal Peminjaman <p-sortIcon field="tanggalPeminjaman"></p-sortIcon></th>
+            <th pSortableColumn="tanggalPengambilan">Tanggal Pengembalian <p-sortIcon field="tanggalPengambilan"></p-sortIcon></th>
+            <th>Action</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-peminjamanBarang let-i="rowIndex">
+          <ng-container *ngFor="let ltBarang of peminjamanBarang.ltBarang; let j=index">
+          <tr>
+            <td style="width:5%; min-width:3rem;">{{i + 1}}</td>
+            <td style="width:25%; min-width:10rem;">
+              <span class="p-column-title">Nama</span>
+              {{ltBarang.namaBarang}}
+            </td>
+            <td style="width:15%; min-width: 8rem;">
+              <span class="p-column-title">Status</span>
+              <span [ngClass]="getStatusBadgeClass(peminjamanBarang.statusPeminjaman)">{{peminjamanBarang.statusPeminjaman}}</span>
+            </td>
+            <td style="width:20%; min-width:10rem;">
+              <span class="p-column-title">Jumlah Peminjaman</span>
+              {{peminjamanBarang.jumlahPeminjaman}}
+            </td>
+            <td style="width:15%; min-width:15rem;">
+              <span class="p-column-title">Tangal Peminjaman</span>
+              {{peminjamanBarang.tanggalPeminjaman | date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td style="width:15%; min-width:15rem;">
+              <span class="p-column-title">Tangal Pengembalian</span>
+              {{peminjamanBarang.tanggalPengambilan | date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td>
+              <div class="flex">
+                <button pButton pRipple icon="pi pi-eye" class="p-button p-button-info mr-2" (click)="getPeminjamanDetail(peminjamanBarang.idPeminjamanBarang)"></button>
+              </div>
+            </td>
+          </tr>
+          </ng-container>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+
+<div class="grid mt-3">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+
+      <p-table #dt [value]="permintaanBarangs" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['kodeBarang','namaBarang','hargaBarang','stokBarang','statusBarang', 'kategoriBarang']" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedBarangs" selectionMode="multiple" [rowHover]="true" dataKey="id">
+        <ng-template pTemplate="caption">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 class="m-0">Pengajuan Permintaan Barang</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="nomorKategori">No </th>
+            <th>Nama Barang</th>
+            <th pSortableColumn="statusPermintaan">Status <p-sortIcon field="statusPermintaan"></p-sortIcon></th>
+            <th pSortableColumn="jumlahPermintaan">Jumlah Permintaan <p-sortIcon field="jumlahPermintaan"></p-sortIcon></th>
+            <th pSortableColumn="tanggalPermintaan">Tanggal Permintaan <p-sortIcon field="tanggalPermintaan"></p-sortIcon></th>
+            <th>Action</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-permintaanBarang let-i="rowIndex">
+          <tr>
+              <td style="width:5%; min-width:3rem;">{{i + 1}}</td>
+              <td style="width:35%; min-width:10rem;">
+                <span class="p-column-title">Nama</span>
+                {{permintaanBarang.namaBarang}}
+              </td>
+
+              <td style="width:15%; min-width: 8rem;">
+                <span class="p-column-title">Status</span>
+                <span [ngClass]="getStatusBadgeClass(permintaanBarang.statusPermintaan)">{{permintaanBarang.statusPermintaan}}</span>
+              </td>
+
+              <td style="width:20%; min-width:10rem;">
+                <span class="p-column-title">Jumlah Permintaan</span>
+                {{permintaanBarang.jumlahPermintaan}}
+              </td>
+
+              <td style="width:15%; min-width:15rem;">
+                <span class="p-column-title">Tangal Permintaan</span>
+                {{permintaanBarang.tanggalPermintaan | date:'yyyy-MM-dd HH:mm:ss'}}
+              </td>
+
+              <td>
+                <div class="flex">
+                  <button pButton pRipple icon="pi pi-eye" class="p-button p-button-info mr-2" (click)="getPermintaanDetail(permintaanBarang.idPermintaanBarang)"></button>
+                </div>
+              </td>
+            </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

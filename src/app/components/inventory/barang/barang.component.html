@@ -1,0 +1,444 @@
+<div class="grid">
+  <div class="spinner-container" *ngIf="progressSpinnerVisible">
+    <p-progressSpinner
+      ariaLabel="loading"
+      styleClass="custom-spinner"
+    ></p-progressSpinner>
+  </div>
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+      <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+          <div class="my-2">
+            <button
+              pButton
+              pRipple
+              label="Tambah Barang"
+              icon="pi pi-plus"
+              class="p-button-success mr-2"
+              (click)="openNew()"
+            ></button>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+          <p-fileUpload
+            mode="basic"
+            accept="image/*"
+            [maxFileSize]="1000000"
+            label="Import"
+            chooseLabel="Import"
+            class="mr-2 inline-block"
+          ></p-fileUpload>
+          <button
+            pButton
+            pRipple
+            label="Export"
+            icon="pi pi-upload"
+            class="p-button-help"
+            (click)="dt.exportCSV()"
+          ></button>
+        </ng-template>
+      </p-toolbar>
+
+      <p-table
+        #dt
+        [value]="barangs"
+        [columns]="cols"
+        responsiveLayout="scroll"
+        [rows]="10"
+        [globalFilterFields]="[
+          'kodeBarang',
+          'namaBarang',
+          'hargaBarang',
+          'stokBarang',
+          'statusBarang',
+          'kategoriBarang'
+        ]"
+        [rows]="10"
+        [paginator]="true"
+        [rowsPerPageOptions]="[10, 20, 30]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [(selection)]="selectedBarangs"
+        selectionMode="multiple"
+        [rowHover]="true"
+        dataKey="id"
+      >
+        <ng-template pTemplate="caption">
+          <div
+            class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+          >
+            <h5 class="m-0">Manage Barang</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="onGlobalFilter(dt, $event)"
+                placeholder="Search..."
+                class="w-full sm:w-auto"
+              />
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="nomorKategori">No</th>
+            <th pSortableColumn="kodeBarang">
+              Kode <p-sortIcon field="kodeBarang"></p-sortIcon>
+            </th>
+            <th pSortableColumn="namaBarang">
+              Nama <p-sortIcon field="namaBarang"></p-sortIcon>
+            </th>
+            <th>Gambar</th>
+            <th pSortableColumn="hargaBarang">
+              Harga <p-sortIcon field="hargaBarang"></p-sortIcon>
+            </th>
+            <th pSortableColumn="stokBarang">
+              Stok <p-sortIcon field="stokBarang"></p-sortIcon>
+            </th>
+            <th pSortableColumn="deskripsiBarang">Deskripsi</th>
+            <th pSortableColumn="statusBarang">
+              Status <p-sortIcon field="statusBarang"></p-sortIcon>
+            </th>
+            <th pSortableColumn="kategoriBarang">
+              Kategori <p-sortIcon field="kategoriBarang"></p-sortIcon>
+            </th>
+            <th pSortableColumn="createdBy">
+              Created By <p-sortIcon field="createdBy"></p-sortIcon>
+            </th>
+            <th pSortableColumn="createdDate">
+              Created Date <p-sortIcon field="createdDate"></p-sortIcon>
+            </th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-barang let-i="rowIndex">
+          <tr>
+            <td style="width: 10%; min-width: 7rem">{{ i + 1 }}</td>
+            <td style="width: 10%; min-width: 7rem">
+              <span class="p-column-title">Kode</span>
+              {{ barang.kodeBarang || barang.idBarang }}
+            </td>
+            <td style="width: 10%; min-width: 10rem">
+              <span class="p-column-title">Nama</span>
+              {{ barang.namaBarang }}
+            </td>
+            <td style="width: 10%; min-width: 10rem">
+              <span class="p-column-title">Gambar</span>
+              <p-image
+                [src]="barang.imageBarang"
+                [alt]="barang.namaBarang"
+                width="70"
+                class="shadow-4"
+                [preview]="true"
+              ></p-image>
+            </td>
+
+            <td style="width: 10%; min-width: 11rem">
+              <span class="p-column-title">Harga</span>
+              {{ barang.hargaBarang | currency : "Rp" }}
+            </td>
+            <td style="width: 10%; min-width: 8rem">
+              <span class="p-column-title">Stok</span>
+              {{ barang.stokBarang }}
+            </td>
+            <td style="width: 10%; min-width: 15rem">
+              <span class="p-column-title">Deskripsi</span>
+              {{ barang.deskripsiBarang }}
+            </td>
+            <td style="width: 10%; min-width: 8rem">
+              <span class="p-column-title">Status</span>
+              <span
+                [class]="
+                  'product-badge status-' +
+                  (barang.statusBarang ? barang.statusBarang.toLowerCase() : '')
+                "
+                >{{ barang.statusBarang }}</span
+              >
+            </td>
+            <td style="width: 10%; min-width: 10rem">
+              <span class="p-column-title">Kategori</span>
+              {{ barang.kategoriBarang.namaKategori }}
+            </td>
+            <td style="width: 10%; min-width: 10rem">
+              <span class="p-column-title">Created By</span>
+              {{ barang.createdBy }}
+            </td>
+            <td style="width: 10%; min-width: 11rem">
+              <span class="p-column-title">Created Date</span>
+              {{ barang.createdDate | date : "yyyy-MM-dd HH:mm:ss" }}
+            </td>
+            <td>
+              <div class="flex">
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-success mr-2"
+                  (click)="editBarang(barang)"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-warning"
+                  (click)="deleteBarang(barang)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <p-dialog
+      [(visible)]="barangDialog"
+      [style]="{ width: '450px' }"
+      header="Barang Details"
+      [modal]="true"
+      class="p-fluid"
+      (onHide)="hideDialog()"
+    >
+      <ng-template pTemplate="content">
+        <div class="form-group mt-2">
+          <label for="namaBarang" class="font-semibold">Nama Barang</label>
+          <input
+            class="form-control mt-1"
+            type="text"
+            pInputText
+            id="namaBarang"
+            [(ngModel)]="postBarang.namaBarang"
+            required
+            autofocus
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && !postBarang.namaBarang
+            }"
+          />
+          <small
+            class="ng-dirty ng-invalid"
+            *ngIf="submitted && !postBarang.namaBarang"
+            >Nama barang is required.</small
+          >
+        </div>
+
+        <div class="form-group mt-2">
+          <label for="kodeBarang" class="font-semibold">Kode Barang</label>
+          <input
+            class="form-control mt-1"
+            type="text"
+            pInputText
+            id="kodeBarang"
+            [(ngModel)]="postBarang.kodeBarang"
+            required
+            autofocus
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && !postBarang.namaBarang
+            }"
+          />
+          <small
+            class="ng-dirty ng-invalid"
+            *ngIf="submitted && !postBarang.namaBarang"
+            >Kode barang is required.</small
+          >
+        </div>
+
+        <div class="form-group mt-2">
+          <label for="status" class="font-semibold">Kategori</label>
+          <div class="mt-1"></div>
+          <p-dropdown
+            class="form-control"
+            [(ngModel)]="postBarang.kategoriBarang"
+            inputId="idKategori"
+            optionValue="value"
+            [options]="dropdownKategori"
+            placeholder="Select"
+          >
+            <ng-template pTemplate="selectedItem">
+              <span
+                *ngIf="postBarang && postBarang.kategoriBarang"
+                [class]="
+                  'barang-badge status-' +
+                  postBarang.kategoriBarang.toString().toLowerCase()
+                "
+                >{{ postBarang.kategoriBarang.namaKategori }}</span
+              >
+            </ng-template>
+            <ng-template let-option pTemplate="item">
+              <span [class]="'barang-badge status-' + option.value">{{
+                option.label
+              }}</span>
+            </ng-template>
+          </p-dropdown>
+        </div>
+
+        <div class="form-group mt-2">
+          <label for="hargaBarang" class="font-semibold">Harga Barang</label>
+          <!--          <input class="form-control" type="number" pInputText inputmode="decimal" id="hargaBarang" [(ngModel)]="postBarang.hargaBarang" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !postBarang.hargaBarang}"/>-->
+          <p-inputNumber
+            class="form-control mt-1"
+            id="hargaBarang"
+            mode="decimal"
+            [showButtons]="true"
+            [min]="0"
+            [(ngModel)]="postBarang.hargaBarang"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && !postBarang.hargaBarang
+            }"
+          ></p-inputNumber>
+          <small
+            class="ng-dirty ng-invalid"
+            *ngIf="submitted && !postBarang.hargaBarang"
+            >Harga barang is required.</small
+          >
+        </div>
+
+        <div class="form-group mt-2">
+          <label for="stokBarang" class="font-semibold">Stok Barang</label>
+          <!--          <input class="form-control" type="number" pInputText inputmode="decimal" id="stokBarang" [(ngModel)]="postBarang.stokBarang" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !postBarang.stokBarang}"/>-->
+          <p-inputNumber
+            class="form-control mt-1"
+            id="stokBarang"
+            mode="decimal"
+            [showButtons]="true"
+            [min]="0"
+            [(ngModel)]="postBarang.stokBarang"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && !postBarang.stokBarang
+            }"
+          ></p-inputNumber>
+          <small
+            class="ng-dirty ng-invalid"
+            *ngIf="submitted && !postBarang.stokBarang"
+            >Stok barang is required.</small
+          >
+        </div>
+
+        <div class="form-group mt-2">
+          <label for="status" class="font-semibold">Status Barang</label>
+          <div class="mt-1"></div>
+          <p-dropdown
+            class="form-control"
+            [(ngModel)]="postBarang.statusBarang"
+            inputId="statusBarang"
+            optionValue="label"
+            [options]="statusDropdown"
+            placeholder="Select"
+          >
+            <ng-template pTemplate="selectedItem">
+              <span
+                *ngIf="postBarang && postBarang.statusBarang"
+                [class]="
+                  'product-badge status-' +
+                  postBarang.statusBarang.toString().toLowerCase()
+                "
+                >{{ postBarang.statusBarang }}</span
+              >
+            </ng-template>
+            <ng-template let-option pTemplate="item">
+              <span [class]="'product-badge status-' + option.value">{{
+                option.label
+              }}</span>
+            </ng-template>
+          </p-dropdown>
+        </div>
+
+        <div class="form-group mt-2">
+          <label for="deskripsiBarang" class="font-semibold"
+            >Deskripsi Barang</label
+          >
+          <textarea
+            class="form-control mt-1"
+            id="deskripsiBarang"
+            pInputTextarea
+            [(ngModel)]="postBarang.deskripsiBarang"
+            required
+            rows="3"
+            cols="20"
+          ></textarea>
+        </div>
+
+        <div class="form-group mt-2">
+          <label for="imageBarang" class="font-semibold">Upload Gambar</label>
+          <div class="mt-1"></div>
+          <p-button
+            label="Choose File"
+            icon="pi pi-upload"
+            (click)="fileInput.click()"
+          ></p-button>
+          <input
+            type="file"
+            #fileInput
+            style="display: none"
+            id="imageBarang"
+            name="imageBarang"
+            accept=".jpg,.jpeg,.png"
+            (change)="onUpload($event)"
+          />
+          <p-image
+            src="{{ postBarang.imageBarang }}"
+            alt="{{ selectedFileName }}"
+            width="100"
+            class="shadow-4"
+            [preview]="true"
+          ></p-image>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="hideDialog()"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="saveBarang()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <p-dialog
+      [(visible)]="deleteBarangDialog"
+      header="Confirm"
+      [modal]="true"
+      [style]="{ width: '450px' }"
+      (onHide)="hideDialog()"
+    >
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="barang"
+          >Are you sure you want to delete <b>{{ barang.namaBarang }}</b
+          >?</span
+        >
+      </div>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          icon="pi pi-times"
+          class="p-button-text"
+          label="No"
+          (click)="deleteBarangDialog = false"
+        ></button>
+        <button
+          pButton
+          pRipple
+          icon="pi pi-check"
+          class="p-button-text"
+          label="Yes"
+          (click)="confirmDelete()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

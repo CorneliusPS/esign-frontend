@@ -1,0 +1,9 @@
+/* Inside the @media query from your provided code */
+.p-dialog .ui-dialog-content {
+  padding: 1rem; /* Reduce padding */
+}
+
+.p-dialog .field {
+  margin-bottom: 1rem; /* Adjust spacing between fields as needed */
+}
+

@@ -1,0 +1,66 @@
+<div class="card mb-3">
+  <div>
+
+
+    <h4>Detail Permintaan Barang</h4>
+    <hr>
+
+    <div *ngIf="permintaanBarang?.statusPermintaan === 'PENDING' ">
+      <pre class="app-code" style="background-color: #fff4ce"><code>Status data permintaan {{permintaanBarang?.statusPermintaan?.toLowerCase()}}</code></pre>
+    </div>
+
+    <div *ngIf="permintaanBarang?.statusPermintaan === 'ACCEPTED' ">
+      <pre class="app-code" style="background-color: #C8E6C9"><code>Status data permintaan {{permintaanBarang?.statusPermintaan?.toLowerCase() + ': ' + permintaanBarang!.catatanAdmin }}</code></pre>
+    </div>
+
+    <div *ngIf="permintaanBarang?.statusPermintaan === 'REJECTED' ">
+      <pre class="app-code" style="background-color: #FFCDD2"><code>Status data permintaan {{permintaanBarang?.statusPermintaan?.toLowerCase() + ': ' + permintaanBarang!.catatanAdmin }}</code></pre>
+    </div>
+
+    <h6>Nama Barang</h6>
+    <pre class="app-input app-input-fill font-semibold"><code>{{ permintaanBarang!.namaBarang }}</code></pre>
+
+    <h6>Desktipsi Barang</h6>
+    <pre class="app-input app-input-fill font-light"><code>{{ permintaanBarang!.deskripsiBarang }}</code></pre>
+
+    <h6>Jumlah Permintaan</h6>
+    <pre class="app-input app-input-fill font-semibold"><code>{{ permintaanBarang!.jumlahPermintaan }}</code></pre>
+
+    <h6>Tanggal Pengajuan Permintaan</h6>
+<!--    <pre class="app-input app-input-fill font-semibold"><code>{{ peminjamanBarang!.tanggalPeminjaman | date:'yyyy-MM-dd HH:mm:ss' }}</code></pre>-->
+    <input type="date" name="start_date" class="form-control app-input app-input-fill font-semibold" style="width: 100%; border: none" id="start_date" value="{{permintaanBarang!.tanggalPermintaan | date:'yyyy-MM-dd' }}" required="">
+
+    <div *ngIf="permintaanBarang?.statusPermintaan === 'ACCEPTED' ">
+      <h6>Tanggal Permintaan Disetujui</h6>
+  <!--    <pre class="app-input app-input-fill font-semibold">{{ peminjamanBarang!.tanggalPengambilan | date:'yyyy-MM-dd HH:mm:ss' }}</pre>-->
+      <input type="date" name="start_date" class="form-control app-input app-input-fill font-semibold" style="width: 100%; border: none" id="start_date" value="{{permintaanBarang!.modifiedDate | date:'yyyy-MM-dd' }}" required="">
+    </div>
+
+    <div class="mt-8">
+      <div class="button-left">
+        <a href="{{ permintaanBarang?.filePermintaan }}" download target="_blank">
+          <button pButton pRipple label="Dokumen Lampiran" icon="pi pi-download" iconPos="right"></button>
+        </a>
+      </div>
+      <div class="button-right" *ngIf="permintaanBarang?.statusPermintaan === 'PENDING'">
+        <div class="grid">
+          <div class="col-12">
+            <button type="text" (click)="confirm()" pButton icon="pi pi-trash" label="Batalkan" class="p-button-danger" style="width:auto;"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p-dialog [(visible)]="deletePermintaanDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}" (onHide)="hideDialog()">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="permintaanBarang">Ingin membatalkan permintaan <b>{{permintaanBarang.namaBarang}}</b>?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deletePermintaanDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete(permintaanBarang!.idPermintaanBarang)"></button>
+      </ng-template>
+    </p-dialog>
+
+  </div>
+</div>

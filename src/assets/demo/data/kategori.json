@@ -1,0 +1,19 @@
+{
+  "data": [
+    {
+      "idKategori": 1,
+      "kodeKategori": "z0001",
+      "namaKategori": "elektronik",
+      "deskripsiKategori": "Untuk barang-barang elektronik",
+      "createdBy": 1,
+      "createdDate": 1711559280995,
+      "modifiedBy": null,
+      "modifiedDate": null,
+      "active": null
+    }
+  ],
+  "success": true,
+  "message": "Kategori berhasil ditemukan!",
+  "status": 200,
+  "timestamp": 1712076819600
+}

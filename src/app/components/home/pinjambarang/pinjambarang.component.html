@@ -1,0 +1,125 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+      <p-toast></p-toast>
+			<h5>Barang</h5>
+			<p-dataView #dv [value]="barangs" [paginator]="true" [rows]="9" filterBy="namaBarang, namaKategori, statusBarang" [sortField]="sortField" [sortOrder]="sortOrder" layout="grid">
+				<ng-template pTemplate="header">
+					<div class="flex flex-column md:flex-row md:justify-content-between gap-2">
+						<p-dropdown [options]="sortOptions" placeholder="Sort By Stock" (onChange)="onSortChange($event)"></p-dropdown>
+						<span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input type="search" pInputText placeholder="Search by Name" (input)="onFilter(dv, $event)">
+                        </span>
+						<p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+					</div>
+				</ng-template>
+
+				<ng-template let-barang pTemplate="gridItem">
+					<div class="col-12 md:col-4">
+						<div class="card m-3 border-1 surface-border">
+							<div class="flex flex-wrap gap-2 align-items-center justify-content-between mb-2">
+								<div class="flex align-items-center">
+									<i class="pi pi-tag mr-2"></i>
+									<span class="font-semibold">{{barang.kategoriBarang.namaKategori}}</span>
+								</div>
+								<span [class]="'product-badge status-' + barang.statusBarang.toLowerCase()">{{barang.statusBarang}}</span>
+							</div>
+							<div class="flex flex-column align-items-center text-center mb-3">
+                <p-image [src]="barang.imageBarang" [alt]="barang.namaBarang" height="200rem" class="shadow-2 my-3 mx-0" [preview]="true"></p-image>
+								<div class="text-2xl font-bold">{{barang.namaBarang}}</div>
+								<div class="mb-3">{{barang.deskripsiBarang}}</div>
+							</div>
+							<div class="flex align-items-center justify-content-between">
+								<span class="text-1xl font-semibold">Stock: {{barang.stokBarang}}</span>
+								<p-button icon="pi pi-send" [disabled]="barang.statusBarang === 'OUTOFSTOCK'" (click)="editBarang(barang)"></p-button>
+							</div>
+						</div>
+					</div>
+				</ng-template>
+
+        <ng-template let-barang pTemplate="listItem">
+          <div class="col-12">
+            <div class="flex flex-column md:flex-row align-items-center p-3 w-full">
+              <img [src]="barang.imageBarang" [alt]="barang.namaBarang" class="my-4 md:my-0 w-9 md:w-10rem shadow-2 mr-5"/>
+              <div class="flex-1 flex flex-column align-items-center text-center md:text-left">
+                <div class="font-bold text-2xl">{{barang.namaBarang}}</div>
+                <div class="mb-2">{{barang.description}}</div>
+                <div class="flex align-items-center mt-2">
+                  <i class="pi pi-tag mr-2"></i>
+                  <span class="font-semibold">{{barang.kategoriBarang.namaKategori}}</span>
+                </div>
+              </div>
+              <div class="flex flex-row md:flex-column justify-content-between w-full md:w-auto align-items-center md:align-items-end mt-5 md:mt-0">
+                <span class="text-1xl font-semibold">Stock: {{barang.stokBarang}}</span>
+                <p-button icon="pi pi-send" label="Pinjam Barang" [disabled]="barang.statusBarang === 'OUTOFSTOCK'" styleClass="mb-2 p-button-sm" (click)="editBarang(barang)"></p-button>
+                <span [class]="'product-badge status-' + barang.statusBarang.toLowerCase()">{{barang.statusBarang}}</span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-dataView>
+		</div>
+	</div>
+
+  <p-dialog *ngIf="mobileSize" [(visible)]="barangDialog" [style]="{width: '450px', height: '800px'}" header="Barang Details" [modal]="true" class="p-fluid" (onHide)="hideDialog()" >
+    <ng-template pTemplate="content">
+
+      <img [src]="barang.imageBarang" [alt]="barang.imageBarang" height="200rem" class="mt-0 mx-auto mb-5 block shadow-2" *ngIf="barang.imageBarang">
+
+      <div class="form-group mt-2">
+        <label for="tanggalPeminjaman">Tanggal Peminjaman</label>
+        <p-calendar id="tanggalPeminjaman" dateFormat="yy-mm-dd" [showIcon]="true" [(ngModel)]="postPinjamBarang.tanggalPeminjaman"></p-calendar>
+      </div>
+
+      <div class="form-group mt-2">
+        <label for="tanggalPengambilan">Tanggal Pengembalian</label>
+        <p-calendar id="tanggalPengambilan" dateFormat="yy-mm-dd" [showIcon]="true" [(ngModel)]="postPinjamBarang.tanggalPengambilan"></p-calendar>
+      </div>
+
+      <div class="form-group mt-2">
+        <label for="jumlahPeminjaman">Jumlah Pinjaman</label>
+<!--        <input type="number" pInputText id="jumlahPeminjaman" [(ngModel)]="postPinjamBarang.jumlahPeminjaman" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !postPinjamBarang.jumlahPeminjaman}"/>-->
+        <p-inputNumber id="jumlahPeminjaman" mode="decimal" [showButtons]="true" [min]="0" [(ngModel)]="postPinjamBarang.jumlahPeminjaman" [ngClass]="{'ng-invalid ng-dirty' : submitted && !postPinjamBarang.jumlahPeminjaman}"></p-inputNumber>
+        <small class="ng-dirty ng-invalid" *ngIf="submitted && !postPinjamBarang.jumlahPeminjaman">Jumlah pinjaman is required.</small>
+      </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Batal" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton pRipple label="Pinjam" icon="pi pi-check" class="p-button-text" (click)="borrowBarang()"></button>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog *ngIf="!mobileSize" [(visible)]="barangDialog" [style]="{width: '450px', height: '800px'}" header="Ajukan Peminjaman Barang" [modal]="true" class="p-fluid" (onHide)="hideDialog()">
+    <ng-template pTemplate="content">
+
+      <img [src]="barang.imageBarang" [alt]="barang.imageBarang" height="200rm" class="mt-5 mx-auto mb-5 block shadow-2" *ngIf="barang.imageBarang">
+
+      <div class="form-group mt-2">
+        <label for="jumlahPeminjaman">Jumlah Pinjaman</label>
+<!--        <input type="number" pInputText id="jumlahPeminjaman" [(ngModel)]="postPinjamBarang.jumlahPeminjaman" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !postPinjamBarang.jumlahPeminjaman}"/>-->
+        <p-inputNumber id="jumlahPeminjaman" mode="decimal" [showButtons]="true" [min]="0" [(ngModel)]="postPinjamBarang.jumlahPeminjaman" [ngClass]="{'ng-invalid ng-dirty' : submitted && !postPinjamBarang.jumlahPeminjaman}"></p-inputNumber>
+        <small class="ng-dirty ng-invalid" *ngIf="submitted && !postPinjamBarang.jumlahPeminjaman">Jumlah pinjaman is required.</small>
+      </div>
+
+      <div class="form-group mt-2">
+        <label for="tanggalPeminjaman">Tanggal Peminjaman</label>
+        <p-calendar id="tanggalPeminjaman" dateFormat="yy-mm-dd" [showIcon]="true" [(ngModel)]="postPinjamBarang.tanggalPeminjaman"></p-calendar>
+      </div>
+
+      <div class="form-grou mt-2">
+        <label for="tanggalPengambilan">Tanggal Pengembalian</label>
+        <p-calendar id="tanggalPengambilan" dateFormat="yy-mm-dd" [showIcon]="true" [(ngModel)]="postPinjamBarang.tanggalPengambilan"></p-calendar>
+      </div>
+
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Batal" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton pRipple label="Pinjam" icon="pi pi-check" class="p-button-text" (click)="borrowBarang()"></button>
+    </ng-template>
+  </p-dialog>
+
+</div>

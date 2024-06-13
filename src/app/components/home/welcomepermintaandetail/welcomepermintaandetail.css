@@ -1,0 +1,70 @@
+.app-input {
+  background-color: var(--surface-ground);
+  margin: 0 0 1rem 0;
+  padding: 0;
+  border-radius: var(--border-radius);
+  overflow: auto;
+}
+
+.app-input-fill {
+  color: var(--surface-900);
+  padding: 1rem;
+  line-height: 1.5;
+  display: block;
+  font-family: monaco, Consolas, monospace;
+  font-size: 1.25rem;
+}
+
+.app-input-fill-light {
+  color: var(--surface-900);
+  padding: 1rem;
+  line-height: 1.5;
+  display: block;
+  font-family: monaco, Consolas, monospace;
+  font-size: 1rem;
+}
+
+/* Overall Container */
+.mt-8 {
+  display: flex; /* Enable flexbox layout */
+  justify-content: space-between; /* Distribute space between button groups */
+  margin-top: 3rem !important;
+}
+
+/* Left Button Container */
+.button-left {
+  /* No specific styles needed for left alignment */
+}
+
+/* Right Button Container */
+.button-right {
+  display: flex; /* Allow buttons to be side-by-side */
+}
+
+/* Spacing between buttons within groups */
+.button-left a + a,
+.button-right a + a {
+  margin-left: 0.5rem;
+}
+
+/* Your existing styles */
+/* ... */
+
+/* Media Query for Smaller Screens (adjust breakpoints as needed) */
+@media (max-width: 768px) { /* Example breakpoint for tablets */
+  .mt-8 {
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-start; /* Align to the left */
+    margin-top: 0 !important;
+  }
+
+  .button-left, .button-right {
+    margin-bottom: 1rem; /* Add space between button groups */
+    width: 100%; /* Make buttons take full width */
+  }
+
+  .button-right {
+    display: block; /* No flex needed inside button-right */
+  }
+}
+

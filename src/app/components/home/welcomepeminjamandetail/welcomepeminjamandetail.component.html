@@ -1,0 +1,65 @@
+<div class="card mb-3">
+  <div>
+
+
+    <h4>Detail Pinjaman Barang</h4>
+    <hr>
+
+    <div *ngIf="peminjamanBarang?.statusPeminjaman === 'PENDING' ">
+      <pre class="app-code" style="background-color: #fff4ce"><code>Status data peminjaman {{peminjamanBarang?.statusPeminjaman?.toLowerCase()}}</code></pre>
+    </div>
+
+    <div *ngIf="peminjamanBarang?.statusPeminjaman === 'ACCEPTED' ">
+      <pre class="app-code" style="background-color: #C8E6C9"><code>Status data peminjaman {{peminjamanBarang?.statusPeminjaman?.toLowerCase() + ': ' + peminjamanBarang!.catatanAdmin }}</code></pre>
+    </div>
+
+    <div *ngIf="peminjamanBarang?.statusPeminjaman === 'REJECTED' ">
+      <pre class="app-code" style="background-color: #FFCDD2"><code>Status data peminjaman {{peminjamanBarang?.statusPeminjaman?.toLowerCase() + ': ' + peminjamanBarang!.catatanAdmin }}</code></pre>
+    </div>
+
+
+    <h6>Foto Barang</h6>
+    <div class="flex justify-content-center">
+      <p-image src="{{peminjamanBarang!.ltBarang[0].imageBarang}}" alt="Image" width="200" [preview]="true"></p-image>
+    </div>
+
+    <h6>Nama Barang Pinjaman</h6>
+    <pre class="app-input app-input-fill font-semibold"><code>{{ peminjamanBarang!.ltBarang[0]!.namaBarang }}</code></pre>
+
+    <h6>Desktipsi Barang</h6>
+    <pre class="app-input app-input-fill font-light"><code>{{ peminjamanBarang!.ltBarang[0].deskripsiBarang }}</code></pre>
+
+    <h6>Jumlah Peminjaman</h6>
+    <pre class="app-input app-input-fill font-semibold"><code>{{ peminjamanBarang!.jumlahPeminjaman }}</code></pre>
+
+    <h6>Tanggal Peminjaman</h6>
+<!--    <pre class="app-input app-input-fill font-semibold"><code>{{ peminjamanBarang!.tanggalPeminjaman | date:'yyyy-MM-dd HH:mm:ss' }}</code></pre>-->
+    <input type="date" name="start_date" class="form-control app-input app-input-fill font-semibold" style="width: 100%; border: none" id="start_date" value="{{peminjamanBarang!.tanggalPeminjaman | date:'yyyy-MM-dd' }}" required="">
+
+    <h6>Tanggal Pengembalian</h6>
+<!--    <pre class="app-input app-input-fill font-semibold">{{ peminjamanBarang!.tanggalPengambilan | date:'yyyy-MM-dd HH:mm:ss' }}</pre>-->
+    <input type="date" name="start_date" class="form-control app-input app-input-fill font-semibold" style="width: 100%; border: none" id="start_date" value="{{peminjamanBarang!.tanggalPengambilan | date:'yyyy-MM-dd' }}" required="">
+
+    <div class="mt-8">
+      <div class="button-right" *ngIf="peminjamanBarang?.statusPeminjaman === 'PENDING'">
+        <div class="grid">
+          <div class="col-12">
+            <button type="text" (click)="confirm()" pButton icon="pi pi-trash" label="Batalkan" class="p-button-danger" style="width:auto;"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p-dialog [(visible)]="deletePeminjamanDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}" (onHide)="hideDialog()">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="peminjamanBarang">Ingin membatalkan peminjaman <b>{{peminjamanBarang!.ltBarang[0].namaBarang}}</b>?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deletePeminjamanDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete(peminjamanBarang!.idPeminjamanBarang)"></button>
+      </ng-template>
+    </p-dialog>
+
+  </div>
+</div>

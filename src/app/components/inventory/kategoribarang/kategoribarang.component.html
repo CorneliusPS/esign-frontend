@@ -1,0 +1,115 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+      <p-toolbar styleClass="mb-4">
+        <ng-template pTemplate="left">
+          <div class="my-2">
+            <button pButton pRipple label="Tambah Kategori" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+          <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block"></p-fileUpload>
+          <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>
+        </ng-template>
+      </p-toolbar>
+
+      <p-table #dt [value]="kategoris" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['nomorKategori','namaKategori','kodeKategori','representative.name','status']" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedKategoris" selectionMode="multiple" [rowHover]="true" dataKey="idKategori">
+        <ng-template pTemplate="caption">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 class="m-0">Manage Kategori</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="nomorKategori">No </th>
+            <th pSortableColumn="kodeKategori">Kode <p-sortIcon field="kodeKategori"></p-sortIcon></th>
+            <th pSortableColumn="namaKategori">Name Kategori <p-sortIcon field="namaKategori"></p-sortIcon></th>
+            <th pSortableColumn="deskripsiKategori">Deskripsi <p-sortIcon field="deskripsiKategori"></p-sortIcon></th>
+            <th pSortableColumn="createdBy">Created By <p-sortIcon field="createdBy"></p-sortIcon></th>
+            <th pSortableColumn="createdDate">Created Date <p-sortIcon field="createdDate"></p-sortIcon></th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-kategori let-i="rowIndex">
+          <tr>
+            <td style="width:10%; min-width:5rem;">{{i + 1}}</td>
+            <td style="width:20%; min-width:10rem;">
+              <span class="p-column-title">Code</span>
+              {{kategori.kodeKategori || kategori.idKategori}}
+            </td>
+            <td style="width:20%; min-width:10rem;">
+              <span class="p-column-title">Name</span>
+              {{kategori.namaKategori}}
+            </td>
+            <td style="width:20%; min-width:8rem;">
+              <span class="p-column-title">Price</span>
+              {{kategori.deskripsiKategori}}
+            </td>
+            <td style="width:20%; min-width:8rem;">
+              <span class="p-column-title">Created By</span>
+              {{kategori.createdBy}}
+            </td>
+            <td style="width:20%; min-width:11rem;">
+              <span class="p-column-title">Created Date</span>
+              {{kategori.createdDate | date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td>
+              <div class="flex">
+                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editKategori(kategori)"></button>
+                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteKategori(kategori)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+
+    <p-dialog [(visible)]="kategoriDialog" [style]="{width: '450px'}" header="Kategori Details" [modal]="true" class="p-fluid">
+
+      <ng-template pTemplate="content">
+        <form [formGroup]="kategoriForm">
+          <div class="field">
+            <label for="kodeKategori" class="font-semibold">Kode Kategori</label>
+            <input type="text" pInputText id="kodeKategori" formControlName="kodeKategori" [(ngModel)]="kategori.kodeKategori" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !kategori.kodeKategori}"/>
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !kategori.kodeKategori">Kode Kategori is required.</small>
+          </div>
+          <div class="field">
+            <label for="namaKategori" class="font-semibold">Kategori</label>
+            <input type="text" pInputText id="namaKategori" formControlName="namaKategori" [(ngModel)]="kategori.namaKategori" required autofocus [ngClass]="{'ng-invalid ng-dirty' : submitted && !kategori.namaKategori}"/>
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !kategori.namaKategori">Name is required.</small>
+          </div>
+          <div class="field">
+            <label for="deskripsiKategori" class="font-semibold">Description</label>
+            <textarea id="deskripsiKategori" formControlName="deskripsiKategori" pInputTextarea [(ngModel)]="kategori.deskripsiKategori" required rows="3" cols="20"></textarea>
+          </div>
+        </form>
+      </ng-template>
+
+
+      <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveKategori()"></button>
+      </ng-template>
+
+    </p-dialog>
+
+
+    <p-dialog [(visible)]="deleteKategoriDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="kategori">Are you sure you want to delete <b>{{kategori.namaKategori}}</b>?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteKategoriDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

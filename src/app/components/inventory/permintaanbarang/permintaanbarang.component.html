@@ -1,0 +1,117 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+
+      <p-table #dt [value]="permintaanBarangs" [columns]="cols" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['user.email','user.noHp','statusPermintaan','jumlahPermintaan']" [rows]="10" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedPermintaanBarangs" selectionMode="multiple" [rowHover]="true" dataKey="idPermintaanBarang">
+        <ng-template pTemplate="caption">
+          <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 class="m-0">Manage Permintaan Barang</h5>
+            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
+                        </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="nomorKategori">No </th>
+            <th pSortableColumn="user.email">Email <p-sortIcon field="user.email"></p-sortIcon></th>
+            <th pSortableColumn="user.noHp">No Hp <p-sortIcon field="user.noHp"></p-sortIcon></th>
+            <th pSortableColumn="namaBarang">Nama Barang <p-sortIcon field="namaBarang"></p-sortIcon></th>
+            <th pSortableColumn="deskripsiBarang">Deskripsi Barang <p-sortIcon field="deskripsiBarang"></p-sortIcon></th>
+            <th pSortableColumn="jumlahPermintaan">Jumlah Permintaan <p-sortIcon field="jumlahPermintaan"></p-sortIcon></th>
+            <th pSortableColumn="statusPermintaan">Status Permintaan <p-sortIcon field="statusPermintaan"></p-sortIcon></th>
+            <th pSortableColumn="catatanAdmin">Catatan Admin <p-sortIcon field="catatanAdmin"></p-sortIcon></th>
+            <th pSortableColumn="tanggalPermintaan">Tanggal Permintaan <p-sortIcon field="tanggalPermintaan"></p-sortIcon></th>
+            <th pSortableColumn="filePermintaan">Dokumen Permintaan  <p-sortIcon field="filePermintaan"></p-sortIcon></th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-permintaanBarang let-i="rowIndex">
+          <tr>
+            <td style="width:10%; min-width:7rem;">{{i + 1}}</td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Email</span>
+              {{permintaanBarang.user.email.toString()}}
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">No Hp</span>
+              {{permintaanBarang.user.noHp}}
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Nama Barang</span>
+              {{permintaanBarang.namaBarang}}
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Deskripsi Barang</span>
+              {{permintaanBarang.deskripsiBarang}}
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Jumlah Permintaan</span>
+              {{permintaanBarang.jumlahPermintaan}}
+            </td>
+            <td style="width:20%; min-width: 15rem;">
+              <span class="p-column-title">Status</span>
+              <span [ngClass]="getStatusBadgeClass(permintaanBarang.statusPermintaan)">{{permintaanBarang.statusPermintaan}}</span>
+            </td>
+            <td style="width:10%; min-width: 15rem;">
+              <span class="p-column-title">Catatan Admin</span>
+              {{permintaanBarang.catatanAdmin}}
+            </td>
+            <td style="width:20%; min-width:15rem;">
+              <span class="p-column-title">Tanggal Permintaan</span>
+              {{permintaanBarang.tanggalPermintaan | date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td style="width:10%; min-width:10rem;">
+              <span class="p-column-title">Dokumen Permintaan</span>
+              <ng-container *ngIf="permintaanBarang.filePermintaan">
+                <a [href]="permintaanBarang.filePermintaan" target="_blank" rel="noopener noreferrer">Preview / Download PDF</a>
+              </ng-container>
+              <ng-container *ngIf="!permintaanBarang.filePermintaan">
+                No PDF Available
+              </ng-container>
+            </td>
+            <td>
+              <div class="flex">
+                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editPermintaanBarang(permintaanBarang)"></button>
+                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deletePermintaanBarang(permintaanBarang)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+
+    <p-dialog [(visible)]="permintaanDialog" [style]="{width: '450px'}" header="Permintaan Barang Details" [modal]="true" class="p-fluid" (onHide)="hideDialog()"
+    >
+
+      <ng-template pTemplate="content">
+          <div class="form-group field">
+            <label for="catatanAdmin">Catatan Admin</label>
+            <textarea id="catatanAdmin" pInputTextarea [(ngModel)]="accRejPermintaanBarang.catatanAdmin" required rows="3" cols="20"></textarea>
+          </div>
+      </ng-template>
+
+
+      <ng-template pTemplate="footer">
+        <button pButton pRipple label="Tolak" icon="pi pi-times" class="p-button-text" (click)="rejPermintaan()"></button>
+        <button pButton pRipple label="Terima" icon="pi pi-check" class="p-button-text" (click)="accPermintaan()"></button>
+      </ng-template>
+
+    </p-dialog>
+
+
+    <p-dialog [(visible)]="deletePermintaanDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+      <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span *ngIf="permintaanBarang">Are you sure you want to delete?</span>
+      </div>
+      <ng-template pTemplate="footer">
+        <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deletePermintaanDialog = false"></button>
+        <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>
