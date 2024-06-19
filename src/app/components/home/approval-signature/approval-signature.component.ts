@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MessageService } from 'primeng/api';
@@ -7,26 +7,31 @@ import { catchError, throwError } from 'rxjs';
 import { IError } from 'src/app/interfaces/i-error';
 import { IResponseList } from 'src/app/interfaces/i-response-list';
 import { IDocumentPost } from 'src/app/interfaces/interface-document/i-document-post';
+import { ApprovalService } from 'src/app/service/approval.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { DocumentService } from 'src/app/service/document.service';
 import { UserService } from 'src/app/service/user.service';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { SignaturePadComponent } from '@almothafar/angular-signature-pad';
 
 @Component({
-  selector: 'app-request-signature',
-  templateUrl: './request-signature.component.html',
-  styleUrls: ['./request-signature.component.scss'],
+  selector: 'app-approval-signature',
+  templateUrl: './approval-signature.component.html',
+  styleUrls: ['./approval-signature.component.scss'],
   providers: [MessageService],
 })
-export class RequestSignatureComponent implements OnInit {
+export class ApprovalSignatureComponent implements OnInit {
+  @ViewChild(SignaturePadComponent) signaturePad!: SignaturePadComponent;
+
   approvers: any[] = [];
   documentName: string = '';
   filteredApprovers: any[] = [];
-  uploadForm: FormGroup | undefined;
-  selectedApprovers: any[] = []; // Multiple selected approvers
+  selectedApprovers: any[] = [];
   selectedApprover: any = {};
+  uploadForm: FormGroup | undefined;
   documents: any[] = [];
   selectedDocuments: any[] = [];
-  documentDialog: boolean = false;
+  approvalDialog: boolean = false;
   deleteDocumentDialog: boolean = false;
   document: any = {};
   submitted: boolean = false;
@@ -37,20 +42,26 @@ export class RequestSignatureComponent implements OnInit {
     timestamp: 0,
   };
   postDocument: IDocumentPost = {};
-
+  oneDocument: any;
   file: any;
-
   distributionOptions = [
     { label: 'Parallel', value: 'parallel' },
     { label: 'Serial', value: 'serial' },
   ];
+
+  signaturePadOptions: any = {
+    minWidth: 1,
+    canvasWidth: 500,
+    canvasHeight: 300,
+  };
 
   constructor(
     private documentService: DocumentService,
     private messageService: MessageService,
     private authService: AuthService,
     public sanitizer: DomSanitizer,
-    private userService: UserService
+    private userService: UserService,
+    private approvalService: ApprovalService
   ) {}
 
   ngOnInit(): void {
@@ -58,8 +69,8 @@ export class RequestSignatureComponent implements OnInit {
   }
 
   loadDocuments() {
-    this.documentService
-      .getDocumentByUploader()
+    this.approvalService
+      .getAllAprover()
       .pipe(
         catchError((error: HttpErrorResponse) => {
           this.error = {
@@ -87,6 +98,7 @@ export class RequestSignatureComponent implements OnInit {
       )
       .subscribe((response: IResponseList) => {
         this.documents = response.data;
+        console.log(this.documents);
       });
   }
 
@@ -101,77 +113,9 @@ export class RequestSignatureComponent implements OnInit {
     }
   }
 
-  saveDocument() {
-    const formData = new FormData();
-
-    if (this.postDocument.fileData) {
-      formData.append('file', this.file);
-    }
-
-    this.documentService
-      .saveDocument(formData, this.postDocument.documentName)
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          this.error = {
-            status: true,
-            message: error.message,
-            timestamp: Date.now(),
-          };
-          if (error.status == 401) {
-            this.error.message = 'Unauthorized';
-          }
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: this.error.message,
-          });
-          return throwError(() => new Error('Error saving document'));
-        })
-      )
-      .subscribe((response: any) => {
-        this.assignApprovers(response.data.idDocument);
-      });
-  }
-
-  assignApprovers(idDocument: number) {
-    const approverIds = this.selectedApprovers.map((approver) => ({
-      idUser: approver.idUser,
-    }));
-
-    this.documentService
-      .assignApprover(idDocument, { approverIds })
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          this.error = {
-            status: true,
-            message: error.message,
-            timestamp: Date.now(),
-          };
-          if (error.status == 401) {
-            this.error.message = 'Unauthorized';
-          }
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: this.error.message,
-          });
-          return throwError(() => new Error('Error assigning approvers'));
-        })
-      )
-      .subscribe(() => {
-        this.loadDocuments();
-        this.hideDialog();
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Document and approvers saved successfully',
-        });
-      });
-  }
-
-  openNew(): void {
-    this.userService
-      .getAllUser()
+  getOneDocument(idDocument: number) {
+    this.approvalService
+      .getOneDocument(idDocument)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           this.error = {
@@ -186,46 +130,30 @@ export class RequestSignatureComponent implements OnInit {
         })
       )
       .subscribe((response: any) => {
-        this.approvers = response.data;
+        this.oneDocument = response.data;
       });
 
     this.postDocument = {};
     this.submitted = false;
-    this.documentDialog = true;
+    this.approvalDialog = true;
+  }
+
+  openNew(): void {
+    this.postDocument = {};
+    this.submitted = false;
+    this.approvalDialog = true;
     this.selectedApprovers = [];
   }
 
   hideDialog(): void {
-    this.documentDialog = false;
+    this.approvalDialog = false;
     this.submitted = false;
     this.postDocument = {};
+    this.signaturePad.clear();
   }
 
   onGlobalFilter(event: Event, dt: any): void {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
-  addApprover() {
-    if (
-      this.selectedApprover &&
-      !this.selectedApprovers.includes(this.selectedApprover)
-    ) {
-      this.selectedApprovers.push(this.selectedApprover);
-      this.selectedApprover = [];
-    }
-  }
-
-  removeApprover(approver: any) {
-    this.selectedApprovers = this.selectedApprovers.filter(
-      (a) => a !== approver
-    );
-  }
-
-  filterApprover(event: any) {
-    const query = event.query.toLowerCase();
-    this.filteredApprovers = this.approvers.filter((approver) =>
-      approver.fullName.toLowerCase().includes(query)
-    );
   }
 
   getStatusBadgeClass(status: boolean): string {
@@ -237,5 +165,43 @@ export class RequestSignatureComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  clearSignature(): void {
+    this.signaturePad.clear();
+  }
+
+  async addSignature(): Promise<void> {
+    if (!this.oneDocument.fileData || this.signaturePad.isEmpty()) return;
+
+    const signatureDataUrl = this.signaturePad.toDataURL('image/png');
+    const signatureImageBytes = Uint8Array.from(
+      atob(signatureDataUrl.split(',')[1]),
+      (c) => c.charCodeAt(0)
+    );
+
+    const pdfBytes = Uint8Array.from(atob(this.oneDocument.fileData), (c) =>
+      c.charCodeAt(0)
+    );
+
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+
+    const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
+    const { width, height } = firstPage.getSize();
+    const signatureImageDims = signatureImage.scale(0.25);
+
+    firstPage.drawImage(signatureImage, {
+      x: width - signatureImageDims.width - 50,
+      y: height - signatureImageDims.height - 50,
+      width: signatureImageDims.width,
+      height: signatureImageDims.height,
+    });
+
+    const modifiedPdfBytes = await pdfDoc.save();
+    this.oneDocument.fileData = btoa(
+      String.fromCharCode(...new Uint8Array(modifiedPdfBytes))
+    );
   }
 }

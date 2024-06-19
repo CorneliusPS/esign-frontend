@@ -13,6 +13,8 @@ export class DocumentService {
   keyToken: string = 'token';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
+
+
   getDocumentByUploader(): Observable<IResponseList> {
     const headers = {
       'Content-Type': 'application/json',
@@ -24,12 +26,23 @@ export class DocumentService {
     );
   }
 
+  getDocumentByApprover(): Observable<IResponseList> {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + this.authService.getToken(),
+    };
+    return this.http.get<IResponseList>(
+      `${this.baseUrl}/api/document/get-all-by-approver`,
+      { headers }
+    );
+  }
+
   //save document file pdf to endpoint /api/document/upload
-  saveDocument(formData: FormData): Observable<any> {
+  saveDocument(formData: FormData, documentName?: string): Observable<any> {
     const headers = {
       Authorization: 'Bearer ' + this.authService.getToken(),
     };
-    return this.http.post(`${this.baseUrl}/api/document/upload`, formData, {
+    return this.http.post(`${this.baseUrl}/api/document/upload?documentName=${documentName}`, formData, {
       headers,
     });
   }

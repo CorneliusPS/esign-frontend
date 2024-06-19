@@ -79,7 +79,7 @@ export class AppMenuComponent implements OnInit {
           ],
         },
         {
-          label: 'Request Signature',
+          label: 'Request',
           items: [
             {
               label: 'Request Signature',
@@ -89,24 +89,12 @@ export class AppMenuComponent implements OnInit {
           ],
         },
         {
-          label: 'Peminjaman Barang',
+          label: 'Approval',
           items: [
             {
-              label: 'Peminjaman Barang',
+              label: 'Approval Signature',
               icon: 'pi pi-fw pi-inbox',
-              routerLink: ['/home/pinjambarang'],
-              badge: 'NEW',
-            },
-          ],
-        },
-        {
-          label: 'Permintaan Barang',
-          items: [
-            {
-              label: 'Permintaan Barang',
-              icon: 'pi pi-fw pi-send',
-              routerLink: ['/home/permintaanbarang'],
-              badge: 'NEW',
+              routerLink: ['/home/approvalsignature'],
             },
           ],
         },

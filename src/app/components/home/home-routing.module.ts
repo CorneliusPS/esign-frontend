@@ -25,19 +25,11 @@ import { RouterModule } from '@angular/router';
           ).then((m) => m.WelcomepermintaandetailModule),
       },
       {
-        path: 'pinjambarang',
-        data: { breadcrumb: 'Peminjaman Barang' },
+        path: 'approvalsignature',
+        data: { breadcrumb: 'Approval Signature' },
         loadChildren: () =>
-          import('./pinjambarang/pinjambarang.module').then(
-            (m) => m.PinjambarangModule
-          ),
-      },
-      {
-        path: 'permintaanbarang',
-        data: { breadcrumb: 'Permintaan Barang' },
-        loadChildren: () =>
-          import('./mintabarang/mintabarang.module').then(
-            (m) => m.MintabarangModule
+          import('./approval-signature/approval-signature.module').then(
+            (m) => m.ApprovalSignatureModule
           ),
       },
       {

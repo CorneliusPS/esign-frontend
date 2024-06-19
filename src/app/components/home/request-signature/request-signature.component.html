@@ -1,6 +1,6 @@
 <div class="grid">
   <div class="col-12">
-    <div class="card px-6 py-6">
+    <div class="card">
       <p-toast></p-toast>
       <p-toolbar styleClass="mb-4">
         <ng-template pTemplate="left">
@@ -22,7 +22,7 @@
         [value]="documents"
         responsiveLayout="scroll"
         [rows]="10"
-        [globalFilterFields]="['fileName', 'documentStatus', 'signed']"
+        [globalFilterFields]="['documentName', 'documentStatus', 'signed']"
         [paginator]="true"
         [rowsPerPageOptions]="[5, 10, 20]"
         [showCurrentPageReport]="true"
@@ -54,8 +54,10 @@
             <!-- <th style="width: 0.5rem">
               <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
             </th> -->
-            <th pSortableColumn="fileName">
-              File Name <p-sortIcon field="fileName"></p-sortIcon>
+
+            <th>No</th>
+            <th pSortableColumn="documentName">
+              Document Name <p-sortIcon field="documentName"></p-sortIcon>
             </th>
             <th pSortableColumn="status">
               Status <p-sortIcon field="status"></p-sortIcon>
@@ -65,20 +67,23 @@
             </th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-document>
+        <ng-template pTemplate="body" let-document let-i="rowIndex">
           <tr>
             <!-- <td><p-tableCheckbox [value]="document"></p-tableCheckbox></td> -->
-            <td style="width: 14%; min-width: 10rem">
+            <td>{{ i + 1 }}</td>
+            <td style="width: 33%; min-width: 10rem">
               <span class="p-column-title">File Name</span
-              >{{ document.fileName }}
+              >{{ document.documentName }}
             </td>
-            <td style="width: 14%; min-width: 10rem">
+            <td style="width: 33%; min-width: 10rem">
               <span class="p-column-title">Status</span
               >{{ document.documentStatus }}
             </td>
-            <td style="width: 14%; min-width: 10rem">
-              <span class="p-column-title">Signature Status</span
-              >{{ document.signed }}
+            <td style="width: 33%; min-width: 10rem">
+              <span class="p-column-title">Status</span>
+              <span [ngClass]="getStatusBadgeClass(document.signed)">{{
+                document.signed
+              }}</span>
             </td>
             <!-- <td>
               <div class="flex">
@@ -112,18 +117,17 @@
     >
       <ng-template pTemplate="content">
         <div class="field form-group">
-          <label for="distributionType" class="font-semibold"
-            >Document Name</label
-          >
+          <label for="documentName" class="font-semibold">Document Name</label>
           <div class="mt-1"></div>
           <input
             id="documentName"
             name="documentName"
             type="text"
             pInputText
-            [(ngModel)]="documentName"
+            [(ngModel)]="postDocument.documentName"
           />
         </div>
+
         <div class="field form-group">
           <label for="pdfDocument" class="font-semibold">Select File</label>
           <div class="mt-1"></div>
