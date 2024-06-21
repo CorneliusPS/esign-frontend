@@ -6,10 +6,12 @@ import { AppComponent } from './app.component';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { NotfoundComponent } from './components/notfound/notfound.component';
 import { HttpClientModule } from '@angular/common/http';
+import { ExamplePdfViewerComponent } from './example-pdf-viewer/example-pdf-viewer.component';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @NgModule({
-  declarations: [AppComponent, NotfoundComponent],
-  imports: [BrowserModule, AppRoutingModule, AppLayoutModule, HttpClientModule],
+  declarations: [AppComponent, NotfoundComponent, ExamplePdfViewerComponent],
+  imports: [BrowserModule, AppRoutingModule, AppLayoutModule, HttpClientModule, NgxExtendedPdfViewerModule],
   providers: [],
   bootstrap: [AppComponent],
 })

@@ -40,6 +40,13 @@ import { RouterModule } from '@angular/router';
             (m) => m.RequestSignatureModule
           ),
       },
+      {
+        path: 'add-signature/:id',
+        loadChildren: () =>
+          import('./add-signature/add-signature.module').then(
+            (m) => m.AddSignatureModule
+          ),
+      },
       { path: '**', redirectTo: '/notfound' },
     ]),
   ],

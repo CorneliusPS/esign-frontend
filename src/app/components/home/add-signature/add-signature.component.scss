@@ -1,0 +1,37 @@
+.signature-box-canvas {
+  border: 1px solid #ccc;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: crosshair;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.pdf-wrapper {
+  position: relative;
+}
+
+.signature-image {
+  position: absolute;
+  width: 150px; /* Adjust the size as needed */
+  height: auto;
+  cursor: move;
+  z-index: 10;
+}
+
+.signature-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.signature-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #007ad9;
+  color: #fff;
+}

@@ -92,6 +92,7 @@ export class RequestSignatureComponent implements OnInit {
 
   onUpload(event: any): void {
     this.file = event.target.files[0];
+    console.log(this.file);
     if (this.file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {

@@ -92,9 +92,14 @@ export class AppMenuComponent implements OnInit {
           label: 'Approval',
           items: [
             {
-              label: 'Approval Signature',
+              label: 'List Request Approval',
               icon: 'pi pi-fw pi-inbox',
               routerLink: ['/home/approvalsignature'],
+            },
+            {
+              label: 'Approve Document',
+              icon: 'pi pi-fw pi-file-edit',
+              routerLink: ['/home/requestsignature'],
             },
           ],
         },

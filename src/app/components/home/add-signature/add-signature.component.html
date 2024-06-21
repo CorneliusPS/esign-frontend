@@ -1,0 +1,25 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h4 class="my-2">Document Name: {{ document.document.documentName }}</h4>
+      <div *ngIf="pdfSrc" class="pdf-container mt-6 ml-1">
+        <div class="pdf-wrapper field form-group">
+          <ngx-extended-pdf-viewer
+            [src]="pdfSrc"
+            [useBrowserLocale]="true"
+            height="100vh"
+            class="shadow-4"
+          ></ngx-extended-pdf-viewer>
+        </div>
+      </div>
+      <button
+        pButton
+        pRipple
+        label="Save"
+        icon="pi pi-check"
+        class="p-button-text"
+        (click)="saveApproval()"
+      ></button>
+    </div>
+  </div>
+</div>

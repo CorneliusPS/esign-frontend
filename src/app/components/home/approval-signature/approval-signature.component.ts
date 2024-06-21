@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MessageService } from 'primeng/api';
@@ -9,10 +9,9 @@ import { IResponseList } from 'src/app/interfaces/i-response-list';
 import { IDocumentPost } from 'src/app/interfaces/interface-document/i-document-post';
 import { ApprovalService } from 'src/app/service/approval.service';
 import { AuthService } from 'src/app/service/auth.service';
-import { DocumentService } from 'src/app/service/document.service';
-import { UserService } from 'src/app/service/user.service';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 import { SignaturePadComponent } from '@almothafar/angular-signature-pad';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-approval-signature',
@@ -22,12 +21,11 @@ import { SignaturePadComponent } from '@almothafar/angular-signature-pad';
 })
 export class ApprovalSignatureComponent implements OnInit {
   @ViewChild(SignaturePadComponent) signaturePad!: SignaturePadComponent;
+  @ViewChild('signatureBoxCanvas')
+  signatureBoxCanvas!: ElementRef<HTMLCanvasElement>;
 
   approvers: any[] = [];
   documentName: string = '';
-  filteredApprovers: any[] = [];
-  selectedApprovers: any[] = [];
-  selectedApprover: any = {};
   uploadForm: FormGroup | undefined;
   documents: any[] = [];
   selectedDocuments: any[] = [];
@@ -44,10 +42,8 @@ export class ApprovalSignatureComponent implements OnInit {
   postDocument: IDocumentPost = {};
   oneDocument: any;
   file: any;
-  distributionOptions = [
-    { label: 'Parallel', value: 'parallel' },
-    { label: 'Serial', value: 'serial' },
-  ];
+  drawing = false;
+  box = { startX: 0, startY: 0, endX: 0, endY: 0 };
 
   signaturePadOptions: any = {
     minWidth: 1,
@@ -56,13 +52,16 @@ export class ApprovalSignatureComponent implements OnInit {
   };
 
   constructor(
-    private documentService: DocumentService,
     private messageService: MessageService,
     private authService: AuthService,
     public sanitizer: DomSanitizer,
-    private userService: UserService,
-    private approvalService: ApprovalService
+    private approvalService: ApprovalService,
+    private router: Router
   ) {}
+
+  ngAfterViewInit(): void {
+    this.loadDocuments();
+  }
 
   ngOnInit(): void {
     this.loadDocuments();
@@ -113,9 +112,9 @@ export class ApprovalSignatureComponent implements OnInit {
     }
   }
 
-  getOneDocument(idDocument: number) {
+  openDialog(idDocument: number) {
     this.approvalService
-      .getOneDocument(idDocument)
+      .getOneApprover(idDocument)
       .pipe(
         catchError((error: HttpErrorResponse) => {
           this.error = {
@@ -136,13 +135,6 @@ export class ApprovalSignatureComponent implements OnInit {
     this.postDocument = {};
     this.submitted = false;
     this.approvalDialog = true;
-  }
-
-  openNew(): void {
-    this.postDocument = {};
-    this.submitted = false;
-    this.approvalDialog = true;
-    this.selectedApprovers = [];
   }
 
   hideDialog(): void {
@@ -166,9 +158,45 @@ export class ApprovalSignatureComponent implements OnInit {
         return '';
     }
   }
+  goToPageSignature(idApprover: number) {
+    this.router.navigate(['/home/add-signature', idApprover]);
+  }
 
   clearSignature(): void {
     this.signaturePad.clear();
+  }
+
+  startDrawing(event: MouseEvent): void {
+    this.drawing = true;
+    const rect = this.signatureBoxCanvas.nativeElement.getBoundingClientRect();
+    this.box.startX = event.clientX - rect.left;
+    this.box.startY = event.clientY - rect.top;
+    this.signatureBoxCanvas.nativeElement.style.pointerEvents = 'auto'; // Enable pointer events
+  }
+
+  draw(event: MouseEvent): void {
+    if (!this.drawing) return;
+    const canvas = this.signatureBoxCanvas.nativeElement;
+    const context = canvas.getContext('2d')!;
+    const rect = canvas.getBoundingClientRect();
+
+    this.box.endX = event.clientX - rect.left;
+    this.box.endY = event.clientY - rect.top;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = 'red';
+    context.lineWidth = 2;
+    context.strokeRect(
+      this.box.startX,
+      this.box.startY,
+      this.box.endX - this.box.startX,
+      this.box.endY - this.box.startY
+    );
+  }
+
+  stopDrawing(): void {
+    this.drawing = false;
+    this.signatureBoxCanvas.nativeElement.style.pointerEvents = 'none'; // Disable pointer events
   }
 
   async addSignature(): Promise<void> {
@@ -186,17 +214,26 @@ export class ApprovalSignatureComponent implements OnInit {
 
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const pages = pdfDoc.getPages();
-    const firstPage = pages[0];
+    const firstPage = pages[1];
 
     const signatureImage = await pdfDoc.embedPng(signatureImageBytes);
     const { width, height } = firstPage.getSize();
-    const signatureImageDims = signatureImage.scale(0.25);
+    const boxWidth = this.box.endX - this.box.startX;
+    const boxHeight = this.box.endY - this.box.startY;
+
+    // Calculate the center position of the signature box
+    const centerX = this.box.startX + (boxWidth - signatureImage.width) / 2;
+    const centerY =
+      height -
+      this.box.startY -
+      (boxHeight - signatureImage.height) / 2 -
+      signatureImage.height;
 
     firstPage.drawImage(signatureImage, {
-      x: width - signatureImageDims.width - 50,
-      y: height - signatureImageDims.height - 50,
-      width: signatureImageDims.width,
-      height: signatureImageDims.height,
+      x: centerX,
+      y: centerY, // Convert canvas coordinate to PDF coordinate
+      width: signatureImage.width,
+      height: signatureImage.height,
     });
 
     const modifiedPdfBytes = await pdfDoc.save();

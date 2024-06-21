@@ -12,12 +12,12 @@ export class ApprovalService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  getOneDocument(idDocument: number) {
+  getOneApprover(idApprover: number) {
     const headers = {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + this.authService.getToken(),
     };
-    return this.http.get(`${this.baseUrl}/api/document/${idDocument}`, {
+    return this.http.get(`${this.baseUrl}/api/approval/get-one/${idApprover}`, {
       headers,
     });
   }
@@ -29,6 +29,17 @@ export class ApprovalService {
     };
     return this.http.get<IResponseList>(
       `${this.baseUrl}/api/approval/get-all-by-user`,
+      { headers }
+    );
+  }
+
+  signDocument(idDocument: number, signature: FormData): Observable<any> {
+    const headers = {
+      Authorization: 'Bearer ' + this.authService.getToken(),
+    };
+    return this.http.post(
+      `${this.baseUrl}/api/signature/${idDocument}/sign-document`,
+      signature,
       { headers }
     );
   }

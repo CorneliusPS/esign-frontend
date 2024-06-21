@@ -22,7 +22,7 @@
           <div
             class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
           >
-            <h5 class="m-0">List Pending Document</h5>
+            <h4 class="m-0">List Request Approval</h4>
             <span class="block mt-2 md:mt-0 p-input-icon-left">
               <i class="pi pi-search"></i>
               <input
@@ -37,11 +37,7 @@
         </ng-template>
         <ng-template pTemplate="header">
           <tr>
-            <!-- <th style="width: 0.5rem">
-              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-            </th> -->
             <th>No</th>
-
             <th pSortableColumn="document.documentName">
               Document Name
               <p-sortIcon field="document.documentName"></p-sortIcon>
@@ -49,13 +45,11 @@
             <th pSortableColumn="approved">
               Signature Status <p-sortIcon field="approved"></p-sortIcon>
             </th>
-
             <th>Action</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-document let-i="rowIndex">
           <tr>
-            <!-- <td><p-tableCheckbox [value]="document"></p-tableCheckbox></td> -->
             <td>{{ i + 1 }}</td>
             <td style="width: 28%; min-width: 10rem">
               <span class="p-column-title">Document Name</span
@@ -63,20 +57,18 @@
             </td>
             <td style="width: 28%; min-width: 8rem">
               <span class="p-column-title">Status</span>
-
               <span [ngClass]="getStatusBadgeClass(document.approved)">{{
                 document.approved
               }}</span>
             </td>
-
             <td>
-              <div class="flex" *ngIf="document.approved == false">
+              <div class="flex">
                 <button
                   pButton
                   pRipple
                   icon="pi pi-pencil"
                   class="p-button-rounded p-button-success mr-2"
-                  (click)="getOneDocument(document.document.idDocument)"
+                  (click)="goToPageSignature(document.idApprover)"
                 ></button>
                 <button
                   pButton
@@ -105,29 +97,40 @@
             Document Name: {{ oneDocument.documentName }}
           </h5>
 
-          <div *ngIf="oneDocument.fileData" class="mt-4">
-            <iframe
-              [src]="
-                sanitizer.bypassSecurityTrustResourceUrl(
-                  'data:application/pdf;base64,' + oneDocument.fileData
-                )
-              "
-              width="100%"
-              height="500px"
-              class="shadow-4"
-            ></iframe>
+          <div *ngIf="oneDocument.fileData" class="pdf-container mt-4">
+            <div class="pdf-wrapper">
+              <iframe
+                [src]="
+                  sanitizer.bypassSecurityTrustResourceUrl(
+                    'data:application/pdf;base64,' + oneDocument.fileData
+                  )
+                "
+                width="100%"
+                height="500px"
+                class="shadow-4"
+              ></iframe>
+              <!-- Canvas for drawing signature box -->
+              <canvas
+                #signatureBoxCanvas
+                width="800"
+                height="500"
+                (mousedown)="startDrawing($event)"
+                (mousemove)="draw($event)"
+                (mouseup)="stopDrawing()"
+                class="signature-box-canvas"
+              ></canvas>
+            </div>
           </div>
-
-          <div class="field mt-4">
-            <h5 for="signature">Signature</h5>
-            <signature-pad [options]="signaturePadOptions"></signature-pad>
-            <button
-              pButton
-              label="Clear"
-              icon="pi pi-times"
-              (click)="clearSignature()"
-            ></button>
-          </div>
+        </div>
+        <div class="field mt-4">
+          <h5 for="signature">Signature</h5>
+          <signature-pad [options]="signaturePadOptions"></signature-pad>
+          <button
+            pButton
+            label="Clear"
+            icon="pi pi-times"
+            (click)="clearSignature()"
+          ></button>
         </div>
       </ng-template>
 
