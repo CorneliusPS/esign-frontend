@@ -7,9 +7,14 @@
           <ngx-extended-pdf-viewer
             [src]="pdfSrc"
             [useBrowserLocale]="true"
-            height="100vh"
+            [showToolbar]="true"
             class="shadow-4"
-          ></ngx-extended-pdf-viewer>
+            [textLayer]="true"
+            [showHandToolButton]="true"
+            [height]="'100vh'"
+          >
+            ></ngx-extended-pdf-viewer
+          >
         </div>
       </div>
       <button
@@ -18,7 +23,7 @@
         label="Save"
         icon="pi pi-check"
         class="p-button-text"
-        (click)="saveApproval()"
+        (click)="export()"
       ></button>
     </div>
   </div>

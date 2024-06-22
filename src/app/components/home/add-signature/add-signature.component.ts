@@ -7,6 +7,7 @@ import { IError } from 'src/app/interfaces/i-error';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MessageService } from 'primeng/api';
+import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
 @Component({
   selector: 'app-add-signature',
@@ -22,13 +23,16 @@ export class AddSignatureComponent implements OnInit {
   modifPdf: Blob | null = null;
   annotationEditor: any;
 
+  blob: any;
+
   constructor(
     private authService: AuthService,
     private approvalService: ApprovalService,
     private activatedRoute: ActivatedRoute,
     public sanitizer: DomSanitizer,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private pdfViewerService: NgxExtendedPdfViewerService
   ) {}
 
   ngOnInit(): void {
@@ -121,7 +125,7 @@ export class AddSignatureComponent implements OnInit {
     formData.append('signatureData', file);
 
     this.approvalService
-      .signDocument(this.document.idDocument, formData)
+      .signDocument(this.document.document.idDocument, formData)
       .pipe(catchError((error) => this.handleHttpError(error)))
       .subscribe(() => {
         this.messageService.add({
@@ -134,14 +138,19 @@ export class AddSignatureComponent implements OnInit {
   }
 
   saveApproval(): void {
-    if (this.modifPdf) {
-      const file = new File([this.modifPdf], 'modifiedDocument.pdf', {
+    if (this.blob) {
+      const file = new File([this.blob], 'modifiedDocument.pdf', {
         type: 'application/pdf',
       });
       this.sendPdfToServer(file);
     } else {
       console.log('No changes to save');
     }
+  }
+
+  public async export(): Promise<void> {
+    this.blob = await this.pdfViewerService.getCurrentDocumentAsBlob();
+    this.saveApproval();
   }
 
   handleHttpError(error: HttpErrorResponse) {

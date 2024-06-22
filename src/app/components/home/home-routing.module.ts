@@ -11,20 +11,6 @@ import { RouterModule } from '@angular/router';
           import('./welcome/welcome.module').then((m) => m.WelcomeModule),
       },
       {
-        path: 'welcome-detail-pinjam/:id',
-        loadChildren: () =>
-          import(
-            './welcomepeminjamandetail/welcomepeminjamandetail.module'
-          ).then((m) => m.WelcomepeminjamandetailModule),
-      },
-      {
-        path: 'welcome-detail-permintaan/:id',
-        loadChildren: () =>
-          import(
-            './welcomepermintaandetail/welcomepermintaandetail.module'
-          ).then((m) => m.WelcomepermintaandetailModule),
-      },
-      {
         path: 'approvalsignature',
         data: { breadcrumb: 'Approval Signature' },
         loadChildren: () =>

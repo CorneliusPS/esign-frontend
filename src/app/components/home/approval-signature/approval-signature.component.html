@@ -62,7 +62,7 @@
               }}</span>
             </td>
             <td>
-              <div class="flex">
+              <div class="flex" *ngIf="document.approved == false">
                 <button
                   pButton
                   pRipple

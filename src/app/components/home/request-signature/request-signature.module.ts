@@ -20,6 +20,7 @@ import { DialogModule } from 'primeng/dialog';
 import { RequestSignatureRoutingModule } from './request-signature-routing.module';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { UserService } from 'src/app/service/user.service';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @NgModule({
   imports: [
@@ -41,6 +42,7 @@ import { UserService } from 'src/app/service/user.service';
     DialogModule,
     AutoCompleteModule,
     ChipsModule,
+    NgxExtendedPdfViewerModule,
   ],
   declarations: [RequestSignatureComponent],
   providers: [DocumentService, UserService],

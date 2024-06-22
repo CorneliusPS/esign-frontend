@@ -165,7 +165,7 @@ export class RequestSignatureComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Document and approvers saved successfully',
+          detail: 'Document sent to approver',
         });
       });
   }
@@ -224,9 +224,12 @@ export class RequestSignatureComponent implements OnInit {
 
   filterApprover(event: any) {
     const query = event.query.toLowerCase();
-    this.filteredApprovers = this.approvers.filter((approver) =>
-      approver.fullName.toLowerCase().includes(query)
-    );
+    this.filteredApprovers = this.approvers
+      .filter((approver) => approver.fullName.toLowerCase().includes(query))
+      .map((approver) => ({
+        ...approver,
+        displayName: `${approver.fullName} (${approver.username})`,
+      }));
   }
 
   getStatusBadgeClass(status: boolean): string {
