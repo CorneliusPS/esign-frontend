@@ -45,7 +45,7 @@
             <th pSortableColumn="approved">
               Signature Status <p-sortIcon field="approved"></p-sortIcon>
             </th>
-            <th>Action</th>
+            <th>Approve Document</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-document let-i="rowIndex">
@@ -55,27 +55,21 @@
               <span class="p-column-title">Document Name</span
               >{{ document.document.documentName }}
             </td>
-            <td style="width: 28%; min-width: 8rem">
+            <td style="width: 28%; min-width: 10rem">
               <span class="p-column-title">Status</span>
               <span [ngClass]="getStatusBadgeClass(document.approved)">{{
                 document.approved
               }}</span>
             </td>
             <td>
-              <div class="flex" *ngIf="document.approved == false">
+              <div class="flex" *ngIf="!document.approved">
                 <button
                   pButton
                   pRipple
+                  label="Sign"
                   icon="pi pi-pencil"
-                  class="p-button-rounded p-button-success mr-2"
+                  class="p-button-rounded p-button-success sm:ml-4"
                   (click)="goToPageSignature(document.idApprover)"
-                ></button>
-                <button
-                  pButton
-                  pRipple
-                  icon="pi pi-trash"
-                  class="p-button-rounded p-button-warning"
-                  (click)="deleteDocumentDialog = true"
                 ></button>
               </div>
             </td>
@@ -83,75 +77,5 @@
         </ng-template>
       </p-table>
     </div>
-
-    <p-dialog
-      [(visible)]="approvalDialog"
-      [style]="{ width: '800px' }"
-      header="Approve Document"
-      [modal]="true"
-      class="p-grid p-fluid"
-    >
-      <ng-template pTemplate="content">
-        <div class="field form-group">
-          <h5 for="documentName" class="font-semibold">
-            Document Name: {{ oneDocument.documentName }}
-          </h5>
-
-          <div *ngIf="oneDocument.fileData" class="pdf-container mt-4">
-            <div class="pdf-wrapper">
-              <iframe
-                [src]="
-                  sanitizer.bypassSecurityTrustResourceUrl(
-                    'data:application/pdf;base64,' + oneDocument.fileData
-                  )
-                "
-                width="100%"
-                height="500px"
-                class="shadow-4"
-              ></iframe>
-              <!-- Canvas for drawing signature box -->
-              <canvas
-                #signatureBoxCanvas
-                width="800"
-                height="500"
-                (mousedown)="startDrawing($event)"
-                (mousemove)="draw($event)"
-                (mouseup)="stopDrawing()"
-                class="signature-box-canvas"
-              ></canvas>
-            </div>
-          </div>
-        </div>
-        <div class="field mt-4">
-          <h5 for="signature">Signature</h5>
-          <signature-pad [options]="signaturePadOptions"></signature-pad>
-          <button
-            pButton
-            label="Clear"
-            icon="pi pi-times"
-            (click)="clearSignature()"
-          ></button>
-        </div>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <button
-          pButton
-          pRipple
-          label="Cancel"
-          icon="pi pi-times"
-          class="p-button-text"
-          (click)="hideDialog()"
-        ></button>
-        <button
-          pButton
-          pRipple
-          label="Save"
-          icon="pi pi-check"
-          class="p-button-text"
-          (click)="addSignature()"
-        ></button>
-      </ng-template>
-    </p-dialog>
   </div>
 </div>

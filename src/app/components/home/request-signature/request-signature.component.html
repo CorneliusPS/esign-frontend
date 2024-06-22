@@ -85,24 +85,6 @@
                 document.signed
               }}</span>
             </td>
-            <!-- <td>
-              <div class="flex">
-                <button
-                  pButton
-                  pRipple
-                  icon="pi pi-pencil"
-                  class="p-button-rounded p-button-success mr-2"
-                  (click)="documentDialog = true"
-                ></button>
-                <button
-                  pButton
-                  pRipple
-                  icon="pi pi-trash"
-                  class="p-button-rounded p-button-warning"
-                  (click)="deleteDocumentDialog = true"
-                ></button>
-              </div>
-            </td> -->
           </tr>
         </ng-template>
       </p-table>
@@ -146,16 +128,17 @@
             (change)="onUpload($event)"
           />
           <div *ngIf="postDocument.fileData" class="mt-3">
-            <iframe
-              [src]="
-                sanitizer.bypassSecurityTrustResourceUrl(
-                  'data:application/pdf;base64,' + postDocument.fileData
-                )
-              "
-              width="100%"
-              height="500px"
+            <ngx-extended-pdf-viewer
+              [src]="pdfSrc"
+              [useBrowserLocale]="true"
+              [showToolbar]="false"
               class="shadow-4"
-            ></iframe>
+              [textLayer]="true"
+              [showHandToolButton]="true"
+              [height]="'100vh'"
+            >
+              ></ngx-extended-pdf-viewer
+            >
           </div>
         </div>
 

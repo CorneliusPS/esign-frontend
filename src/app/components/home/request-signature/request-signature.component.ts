@@ -10,6 +10,7 @@ import { IDocumentPost } from 'src/app/interfaces/interface-document/i-document-
 import { AuthService } from 'src/app/service/auth.service';
 import { DocumentService } from 'src/app/service/document.service';
 import { UserService } from 'src/app/service/user.service';
+import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 
 @Component({
   selector: 'app-request-signature',
@@ -40,6 +41,9 @@ export class RequestSignatureComponent implements OnInit {
 
   file: any;
 
+  pdfSrc: any;
+  blob: any;
+
   distributionOptions = [
     { label: 'Parallel', value: 'parallel' },
     { label: 'Serial', value: 'serial' },
@@ -50,7 +54,8 @@ export class RequestSignatureComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     public sanitizer: DomSanitizer,
-    private userService: UserService
+    private userService: UserService,
+    private pdfViewerService: NgxExtendedPdfViewerService
   ) {}
 
   ngOnInit(): void {
@@ -90,19 +95,53 @@ export class RequestSignatureComponent implements OnInit {
       });
   }
 
+  sanitizeBase64(base64: string): string {
+    return base64.replace(/[^A-Za-z0-9+/=]/g, '');
+  }
+
+  convertBase64ToBlob(base64: string, type: string): Blob {
+    const byteCharacters = atob(base64);
+    const byteNumbers = Array.from(byteCharacters, (char) =>
+      char.charCodeAt(0)
+    );
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type });
+  }
+
+  loadPdf(pdfData: string): void {
+    try {
+      const sanitizedPdfData = this.sanitizeBase64(pdfData);
+      const blob = this.convertBase64ToBlob(
+        sanitizedPdfData,
+        'application/pdf'
+      );
+      this.pdfSrc = URL.createObjectURL(blob);
+    } catch (error) {
+      this.handleError('Failed to load PDF', this.error.message);
+    }
+  }
+
   onUpload(event: any): void {
     this.file = event.target.files[0];
     console.log(this.file);
     if (this.file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.postDocument.fileData = e.target.result.split(',')[1];
+        const fileData = e.target.result.split(',')[1];
+        this.postDocument.fileData = fileData;
+        this.loadPdf(fileData); // Panggil loadPdf setelah mendapatkan data PDF
       };
       reader.readAsDataURL(this.file);
     }
   }
 
+  public async export(): Promise<void> {
+    this.blob = await this.pdfViewerService.getCurrentDocumentAsBlob();
+    return this.blob;
+  }
+
   saveDocument() {
+    this.export();
     const formData = new FormData();
 
     if (this.postDocument.fileData) {
@@ -241,5 +280,13 @@ export class RequestSignatureComponent implements OnInit {
       default:
         return '';
     }
+  }
+  private handleError(message: string, detail: string = ''): void {
+    this.error = { status: true, message, timestamp: Date.now() };
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: `${message}${detail ? `: ${detail}` : ''}`,
+    });
   }
 }
