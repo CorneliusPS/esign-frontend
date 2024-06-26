@@ -10,6 +10,9 @@ import { AngularSignaturePadModule } from '@almothafar/angular-signature-pad';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 
 @NgModule({
   declarations: [AddSignatureComponent],
@@ -22,6 +25,9 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     RippleModule,
     NgxExtendedPdfViewerModule,
     AngularSignaturePadModule,
+    FormsModule, // Tambahkan FormsModule ke dalam imports array
+    InputTextModule,
+    DialogModule,
   ],
   providers: [AuthService, ApprovalService],
 })

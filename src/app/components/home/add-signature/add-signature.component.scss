@@ -35,3 +35,37 @@ button:hover {
   background-color: #007ad9;
   color: #fff;
 }
+
+.otp-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+.confirmation-dialog .confirmation-content {
+  text-align: center;
+}
+
+.confirmation-dialog .otp-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.confirmation-dialog .otp-input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+}

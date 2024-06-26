@@ -38,16 +38,10 @@ export class RequestSignatureComponent implements OnInit {
     timestamp: 0,
   };
   postDocument: IDocumentPost = {};
-
   file: any;
-
   pdfSrc: any;
   blob: any;
-
-  distributionOptions = [
-    { label: 'Parallel', value: 'parallel' },
-    { label: 'Serial', value: 'serial' },
-  ];
+  pdfDialog: boolean = false;
 
   constructor(
     private documentService: DocumentService,
@@ -208,6 +202,10 @@ export class RequestSignatureComponent implements OnInit {
         });
       });
   }
+  openPdfViewer(document: any): void {
+    this.loadPdf(document.fileData);
+    this.pdfDialog = true;
+  }
 
   openNew(): void {
     this.userService
@@ -241,6 +239,11 @@ export class RequestSignatureComponent implements OnInit {
     this.postDocument = {};
   }
 
+  hidePdfDialog(): void {
+    this.pdfDialog = false;
+    this.pdfSrc = null;
+  }
+
   onGlobalFilter(event: Event, dt: any): void {
     dt.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
@@ -248,10 +251,18 @@ export class RequestSignatureComponent implements OnInit {
   addApprover() {
     if (
       this.selectedApprover &&
-      !this.selectedApprovers.includes(this.selectedApprover)
+      !this.selectedApprovers.some(
+        (approver) => approver.idUser === this.selectedApprover.idUser
+      )
     ) {
       this.selectedApprovers.push(this.selectedApprover);
-      this.selectedApprover = [];
+      this.selectedApprover = {};
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Duplicate Approver',
+        detail: 'The selected approver is already added.',
+      });
     }
   }
 

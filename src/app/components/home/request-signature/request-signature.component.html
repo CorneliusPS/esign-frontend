@@ -69,11 +69,12 @@
         </ng-template>
         <ng-template pTemplate="body" let-document let-i="rowIndex">
           <tr>
-            <!-- <td><p-tableCheckbox [value]="document"></p-tableCheckbox></td> -->
             <td>{{ i + 1 }}</td>
             <td style="width: 33%; min-width: 10rem">
-              <span class="p-column-title">File Name</span
-              >{{ document.documentName }}
+              <span class="p-column-title">Document Name</span>
+              <a class="cursor-pointer" (click)="openPdfViewer(document)">{{
+                document.documentName
+              }}</a>
             </td>
             <td style="width: 33%; min-width: 10rem">
               <span class="p-column-title">Status</span
@@ -92,10 +93,9 @@
 
     <p-dialog
       [(visible)]="documentDialog"
-      [style]="{ width: '40vw' }"
       header="Add Signature"
       [modal]="true"
-      class="p-grid p-fluid"
+      [styleClass]="'p-grid p-fluid w-12 md:w-4'"
     >
       <ng-template pTemplate="content">
         <div class="field form-group">
@@ -135,7 +135,7 @@
               class="shadow-4"
               [textLayer]="true"
               [showHandToolButton]="true"
-              [height]="'100vh'"
+              [height]="'55vh'"
             >
               ></ngx-extended-pdf-viewer
             >
@@ -207,6 +207,35 @@
     </p-dialog>
 
     <p-dialog
+      [(visible)]="pdfDialog"
+      header="Preview Document"
+      [modal]="true"
+      [styleClass]="'p-grid p-fluid w-12 md:w-4'"
+      [closable]="true"
+    >
+      <ng-template pTemplate="content">
+        <ngx-extended-pdf-viewer
+          [src]="pdfSrc"
+          [useBrowserLocale]="true"
+          class="shadow-4"
+          [textLayer]="true"
+          [showHandToolButton]="true"
+          [height]="'70vh'"
+        ></ngx-extended-pdf-viewer>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Close"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="hidePdfDialog()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- <p-dialog
       [(visible)]="deleteDocumentDialog"
       header="Confirm"
       [modal]="true"
@@ -237,6 +266,6 @@
           (click)="deleteDocumentDialog = false"
         ></button>
       </ng-template>
-    </p-dialog>
+    </p-dialog> -->
   </div>
 </div>

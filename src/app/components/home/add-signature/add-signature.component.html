@@ -1,18 +1,37 @@
 <div class="grid">
   <div class="col-12">
     <div class="card">
+      <p-toast></p-toast>
       <div class="header md:flex justify-content-between align-items-center">
-        <h4 class="md:mb-8">
+        <h4 class="text-lg md:mb-8 md:text-2xl">
           Approve Document {{ document.document.documentName }}
         </h4>
-        <button
+        <div class="button-group">
+          <button
+            pButton
+            pRipple
+            label="Back"
+            icon="pi pi-arrow-left"
+            class="p-button-secondary mr-2"
+            (click)="goBack()"
+          ></button>
+          <button
+            pButton
+            pRipple
+            label="Approve"
+            icon="pi pi-check"
+            class="p-button-success"
+            (click)="export()"
+          ></button>
+        </div>
+        <!-- <button
           pButton
-          pRipple
+          type="button"
           label="Approve"
           icon="pi pi-check"
           class="p-button-success"
-          (click)="export()"
-        ></button>
+          (click)="showModal()"
+        ></button> -->
       </div>
       <div *ngIf="pdfSrc" class="pdf-container mt-4">
         <div class="pdf-wrapper field form-group">
@@ -30,5 +49,48 @@
         </div>
       </div>
     </div>
+
+    <p-dialog
+      header="Konfirmasi"
+      [(visible)]="displayModal"
+      [modal]="true"
+      [style]="{ width: '25vw', height: '27vh' }"
+      [closable]="true"
+      [resizable]="false"
+      class="confirmation-dialog"
+    >
+      <ng-template pTemplate="content">
+        <div class="confirmation-content">
+          <label class="text-lg"
+            >Masukkan 6 digit kode yang dikirimkan ke email Anda. <br />
+            test@bcafinance.com</label
+          >
+          <div class="otp-container">
+            <ng-container *ngFor="let ctrl of otpControls; let i = index">
+              <input
+                pInputText
+                type="text"
+                maxlength="1"
+                [(ngModel)]="otp[i]"
+                (input)="onInput($event, i)"
+                (keydown.backspace)="onBackspace($event, i)"
+                class="otp-input"
+                #otpInput
+              />
+            </ng-container>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          type="button"
+          label="Submit"
+          icon="pi pi-check"
+          (click)="hideModal()"
+          class="p-button-primary"
+        ></button>
+      </ng-template>
+    </p-dialog>
   </div>
 </div>

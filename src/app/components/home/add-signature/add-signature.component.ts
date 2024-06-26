@@ -1,6 +1,6 @@
 import { AuthService } from 'src/app/service/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { ApprovalService } from 'src/app/service/approval.service';
 import { IError } from 'src/app/interfaces/i-error';
@@ -22,8 +22,12 @@ export class AddSignatureComponent implements OnInit {
   pdfSrc: any;
   modifPdf: Blob | null = null;
   annotationEditor: any;
-
   blob: any;
+  displayModal: boolean = false;
+  otp: string[] = ['', '', '', '', '', '']; // Sesuaikan panjang OTP
+  otpControls: any[] = new Array(this.otp.length);
+
+  @Output() otpChange: EventEmitter<string> = new EventEmitter<string>();
 
   constructor(
     private authService: AuthService,
@@ -133,7 +137,10 @@ export class AddSignatureComponent implements OnInit {
           summary: 'Success',
           detail: 'Document signed successfully',
         });
-        this.router.navigate(['/home/approvalsignature']);
+        // Menambahkan setTimeout untuk menunda navigasi
+        setTimeout(() => {
+          this.router.navigate(['/home/approvalsignature']);
+        }, 1000);
       });
   }
 
@@ -151,6 +158,10 @@ export class AddSignatureComponent implements OnInit {
   public async export(): Promise<void> {
     this.blob = await this.pdfViewerService.getCurrentDocumentAsBlob();
     this.saveApproval();
+  }
+
+  goBack() {
+    this.router.navigate(['/home/approvalsignature']);
   }
 
   handleHttpError(error: HttpErrorResponse) {
@@ -180,5 +191,38 @@ export class AddSignatureComponent implements OnInit {
       message: '',
       timestamp: 0,
     };
+  }
+
+  showModal(): void {
+    this.displayModal = true;
+  }
+
+  hideModal(): void {
+    this.displayModal = false;
+    console.log('OTP', this.otp);
+
+    const result = this.otp.map((i) => Number(i));
+    console.log(result);
+
+    this.otp = this.otp.map(() => '');
+  }
+
+  onInput(event: any, index: number): void {
+    const input = event.target.value;
+    if (/^[0-9]$/.test(input)) {
+      if (index < this.otp.length - 1) {
+        (event.target.nextElementSibling as HTMLInputElement).focus();
+      }
+    } else {
+      event.target.value = '';
+    }
+    this.otp[index] = input;
+    this.otpChange.emit(this.otp.join(''));
+  }
+
+  onBackspace(event: any, index: number): void {
+    if (event.key === 'Backspace' && index > 0 && !this.otp[index]) {
+      (event.target.previousElementSibling as HTMLInputElement).focus();
+    }
   }
 }

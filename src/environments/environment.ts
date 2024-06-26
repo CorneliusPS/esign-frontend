@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   // apiBaseUrl: 'https://finalproject-roobeysk4q-et.a.run.app',
-  apiBaseUrl: 'http://localhost:8080', // Jika ingin mneggunakan API yang di Local Server
+  apiBaseUrl: 'http://192.168.157.178:8080', // Jika ingin mneggunakan API yang di Local Server
 };
 
 /*
