@@ -31,7 +31,9 @@
         <p-toast></p-toast>
         <div class="text-center mb-5">
           <!--                      <img src="assets/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3">-->
-          <div class="text-900 text-3xl font-medium mb-3">E-Sign Internal</div>
+          <div class="text-900 text-3xl font-medium mb-3">
+            E-Signature Internal
+          </div>
           <span class="text-600 font-medium">Sign in to continue</span>
         </div>
 
@@ -45,7 +47,7 @@
             <input
               id="username"
               type="text"
-              placeholder="Username"
+              placeholder="Masukkan NIP Anda"
               formControlName="username"
               name="username"
               pInputText
@@ -76,7 +78,7 @@
             <p-password
               [feedback]="false"
               id="password"
-              placeholder="Password"
+              placeholder="Masukkan Password Anda"
               formControlName="password"
               name="password"
               [toggleMask]="true"
@@ -99,18 +101,18 @@
             </small>
 
             <div
-              class="flex align-items-center justify-content-between mb-5 mt-5 gap-5"
+              class="flex align-items-center justify-content-between mb-5 mt-2 gap-5"
             >
               <div class="flex align-items-center">
                 <!--                              <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox>-->
                 <!--                              <label for="rememberme1">Remember me</label>-->
                 <!--                            <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(&#45;&#45;primary-color)">Sign Up</a>-->
               </div>
-              <a
+              <!-- <a
                 class="font-medium no-underline ml-2 text-right cursor-pointer"
                 style="color: var(--primary-color)"
                 >Forgot password?</a
-              >
+              > -->
             </div>
             <button
               (click)="loginUser()"
@@ -122,14 +124,14 @@
               type="button"
               [routerLink]="['/admin/dashboard']"
             ></button>
-            <div class="flex align-items-center justify-content-center mt-5">
+            <!-- <div class="flex align-items-center justify-content-center mt-5">
               <a
                 class="font-medium no-underline ml-2 text-right cursor-pointer"
                 style="color: var(--primary-color)"
                 [routerLink]="['/auth/register']"
                 >Don't have account? Register Here</a
               >
-            </div>
+            </div> -->
           </form>
         </div>
       </div>

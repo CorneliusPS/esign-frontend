@@ -1,10 +1,16 @@
 <div class="grid">
+  <div class="spinner-container" *ngIf="progressSpinnerVisible">
+    <p-progressSpinner
+      ariaLabel="loading"
+      styleClass="custom-spinner"
+    ></p-progressSpinner>
+  </div>
   <div class="col-12">
     <div class="card">
       <p-toast></p-toast>
       <div class="header md:flex justify-content-between align-items-center">
         <h4 class="text-lg md:mb-8 md:text-2xl">
-          Approve Document {{ document.document.documentName }}
+          Approve Document {{ data.document.documentName }}
         </h4>
         <div class="button-group">
           <button
@@ -24,14 +30,14 @@
             (click)="export()"
           ></button>
         </div>
-        <!-- <button
+        <button
           pButton
           type="button"
           label="Approve"
           icon="pi pi-check"
           class="p-button-success"
           (click)="showModal()"
-        ></button> -->
+        ></button>
       </div>
       <div *ngIf="pdfSrc" class="pdf-container mt-4">
         <div class="pdf-wrapper field form-group">
@@ -52,7 +58,7 @@
 
     <p-dialog
       header="Konfirmasi"
-      [(visible)]="displayModal"
+      [(visible)]="otpModal"
       [modal]="true"
       [style]="{ width: '25vw', height: '27vh' }"
       [closable]="true"
@@ -63,8 +69,9 @@
         <div class="confirmation-content">
           <label class="text-lg"
             >Masukkan 6 digit kode yang dikirimkan ke email Anda. <br />
-            test@bcafinance.com</label
-          >
+            {{ email }}
+          </label>
+
           <div class="otp-container">
             <ng-container *ngFor="let ctrl of otpControls; let i = index">
               <input

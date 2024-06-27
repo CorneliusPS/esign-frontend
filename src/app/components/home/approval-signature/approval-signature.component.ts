@@ -27,11 +27,9 @@ export class ApprovalSignatureComponent implements OnInit {
   approvers: any[] = [];
   documentName: string = '';
   uploadForm: FormGroup | undefined;
-  documents: any[] = [];
-  selectedDocuments: any[] = [];
+  datas: any[] = [];
   approvalDialog: boolean = false;
   deleteDocumentDialog: boolean = false;
-  document: any = {};
   submitted: boolean = false;
   distributionType: string = '';
   error: IError = {
@@ -96,8 +94,7 @@ export class ApprovalSignatureComponent implements OnInit {
         })
       )
       .subscribe((response: IResponseList) => {
-        this.documents = response.data;
-        console.log(this.documents);
+        this.datas = response.data;
       });
   }
 

@@ -43,4 +43,15 @@ export class ApprovalService {
       { headers }
     );
   }
+
+  sendOtp(idApprover: number, otp: string): Observable<any> {
+    const headers = {
+      Authorization: 'Bearer ' + this.authService.getToken(),
+    };
+    return this.http.post(
+      `${this.baseUrl}/api/approval/send-otp?idApprover=${idApprover}`,
+      { otp },
+      { headers }
+    );
+  }
 }

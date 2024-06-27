@@ -13,6 +13,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @NgModule({
   declarations: [AddSignatureComponent],
@@ -28,6 +29,7 @@ import { InputTextModule } from 'primeng/inputtext';
     FormsModule, // Tambahkan FormsModule ke dalam imports array
     InputTextModule,
     DialogModule,
+    ProgressSpinnerModule,
   ],
   providers: [AuthService, ApprovalService],
 })

@@ -18,14 +18,16 @@ import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 export class AddSignatureComponent implements OnInit {
   idApprover: string = '';
   error: IError = this.initializeError();
-  document: any;
+  data: any;
   pdfSrc: any;
   modifPdf: Blob | null = null;
   annotationEditor: any;
   blob: any;
-  displayModal: boolean = false;
+  otpModal: boolean = false;
   otp: string[] = ['', '', '', '', '', '']; // Sesuaikan panjang OTP
   otpControls: any[] = new Array(this.otp.length);
+  progressSpinnerVisible: boolean = false;
+  email: string = '';
 
   @Output() otpChange: EventEmitter<string> = new EventEmitter<string>();
 
@@ -41,6 +43,7 @@ export class AddSignatureComponent implements OnInit {
 
   ngOnInit(): void {
     this.idApprover = this.activatedRoute.snapshot.paramMap.get('id')!;
+    //get email from local storage
     this.loadDocument(Number(this.idApprover));
   }
 
@@ -49,8 +52,9 @@ export class AddSignatureComponent implements OnInit {
       .getOneApprover(idApprover)
       .pipe(catchError((error) => this.handleHttpError(error)))
       .subscribe((response: any) => {
-        this.document = response.data;
-        this.loadPdf(this.document.document.fileData);
+        this.data = response.data;
+        console.log(this.data);
+        this.loadPdf(this.data.document.fileData);
       });
   }
 
@@ -80,40 +84,6 @@ export class AddSignatureComponent implements OnInit {
     return new Blob([byteArray], { type });
   }
 
-  onAnnotationEditorCreated(event: any): void {
-    this.annotationEditor = event;
-    this.annotationEditor.addEventListener(
-      'annotationAdded',
-      this.capturePdfChanges.bind(this)
-    );
-    this.annotationEditor.addEventListener(
-      'annotationRemoved',
-      this.capturePdfChanges.bind(this)
-    );
-    this.annotationEditor.addEventListener(
-      'annotationUpdated',
-      this.capturePdfChanges.bind(this)
-    );
-  }
-
-  onAnnotationEditorDestroyed(): void {
-    if (this.annotationEditor) {
-      this.annotationEditor.removeEventListener(
-        'annotationAdded',
-        this.capturePdfChanges.bind(this)
-      );
-      this.annotationEditor.removeEventListener(
-        'annotationRemoved',
-        this.capturePdfChanges.bind(this)
-      );
-      this.annotationEditor.removeEventListener(
-        'annotationUpdated',
-        this.capturePdfChanges.bind(this)
-      );
-      this.annotationEditor = null;
-    }
-  }
-
   capturePdfChanges(): void {
     if (this.annotationEditor) {
       this.annotationEditor.save().then((pdfDocument: any) => {
@@ -129,7 +99,7 @@ export class AddSignatureComponent implements OnInit {
     formData.append('signatureData', file);
 
     this.approvalService
-      .signDocument(this.document.document.idDocument, formData)
+      .signDocument(this.data.document.idDocument, formData)
       .pipe(catchError((error) => this.handleHttpError(error)))
       .subscribe(() => {
         this.messageService.add({
@@ -137,6 +107,7 @@ export class AddSignatureComponent implements OnInit {
           summary: 'Success',
           detail: 'Document signed successfully',
         });
+        this.progressSpinnerVisible = true;
         // Menambahkan setTimeout untuk menunda navigasi
         setTimeout(() => {
           this.router.navigate(['/home/approvalsignature']);
@@ -194,11 +165,14 @@ export class AddSignatureComponent implements OnInit {
   }
 
   showModal(): void {
-    this.displayModal = true;
+    this.email = this.authService.getEmail();
+    
+    this.otpModal = true;
   }
 
   hideModal(): void {
-    this.displayModal = false;
+    this.email = '';
+    this.otpModal = false;
     console.log('OTP', this.otp);
 
     const result = this.otp.map((i) => Number(i));

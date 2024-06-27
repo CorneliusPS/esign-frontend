@@ -25,11 +25,9 @@ export class RequestSignatureComponent implements OnInit {
   uploadForm: FormGroup | undefined;
   selectedApprovers: any[] = []; // Multiple selected approvers
   selectedApprover: any = {};
-  documents: any[] = [];
-  selectedDocuments: any[] = [];
+  datas: any[] = [];
   documentDialog: boolean = false;
   deleteDocumentDialog: boolean = false;
-  document: any = {};
   submitted: boolean = false;
   distributionType: string = '';
   error: IError = {
@@ -85,7 +83,7 @@ export class RequestSignatureComponent implements OnInit {
         })
       )
       .subscribe((response: IResponseList) => {
-        this.documents = response.data;
+        this.datas = response.data;
       });
   }
 
