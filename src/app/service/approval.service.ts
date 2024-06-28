@@ -44,13 +44,25 @@ export class ApprovalService {
     );
   }
 
-  sendOtp(idApprover: number, otp: string): Observable<any> {
+  sendOtp(idApprover: number): Observable<any> {
     const headers = {
       Authorization: 'Bearer ' + this.authService.getToken(),
     };
     return this.http.post(
       `${this.baseUrl}/api/approval/send-otp?idApprover=${idApprover}`,
-      { otp },
+      {},
+      { headers }
+    );
+  }
+
+  verifOtp(idApprover: number, body: any): Observable<any> {
+    const headers = {
+      Authorization: 'Bearer ' + this.authService.getToken(),
+    };
+    console.log(body);
+    return this.http.post(
+      `${this.baseUrl}/api/approval/verif-otp?idApprover=${idApprover}`,
+      body,
       { headers }
     );
   }

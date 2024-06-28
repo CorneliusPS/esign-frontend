@@ -28,6 +28,9 @@ export class AddSignatureComponent implements OnInit {
   otpControls: any[] = new Array(this.otp.length);
   progressSpinnerVisible: boolean = false;
   email: string = '';
+  maskedEmail: string = '';
+  otpCountdown: number = 0; // countdown timer
+  otpTimer: any; // reference to the timer
 
   @Output() otpChange: EventEmitter<string> = new EventEmitter<string>();
 
@@ -50,7 +53,16 @@ export class AddSignatureComponent implements OnInit {
   loadDocument(idApprover: number): void {
     this.approvalService
       .getOneApprover(idApprover)
-      .pipe(catchError((error) => this.handleHttpError(error)))
+      .pipe(
+        catchError((error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message,
+          });
+          return throwError(() => new Error('Error fetching'));
+        })
+      )
       .subscribe((response: any) => {
         this.data = response.data;
         console.log(this.data);
@@ -67,7 +79,13 @@ export class AddSignatureComponent implements OnInit {
       );
       this.pdfSrc = URL.createObjectURL(blob);
     } catch (error) {
-      this.handleError('Failed to load PDF', this.error.message);
+      {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: this.error.message,
+        });
+      }
     }
   }
 
@@ -100,7 +118,16 @@ export class AddSignatureComponent implements OnInit {
 
     this.approvalService
       .signDocument(this.data.document.idDocument, formData)
-      .pipe(catchError((error) => this.handleHttpError(error)))
+      .pipe(
+        catchError((error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message,
+          });
+          return throwError(() => new Error('Error sending pdf to server'));
+        })
+      )
       .subscribe(() => {
         this.messageService.add({
           severity: 'success',
@@ -135,27 +162,6 @@ export class AddSignatureComponent implements OnInit {
     this.router.navigate(['/home/approvalsignature']);
   }
 
-  handleHttpError(error: HttpErrorResponse) {
-    this.error = {
-      status: true,
-      message: error.message,
-      timestamp: Date.now(),
-    };
-    if (error.status === 401) {
-      this.authService.logout();
-    }
-    return throwError(() => new Error('Error fetching'));
-  }
-
-  private handleError(message: string, detail: string = ''): void {
-    this.error = { status: true, message, timestamp: Date.now() };
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: `${message}${detail ? `: ${detail}` : ''}`,
-    });
-  }
-
   private initializeError(): IError {
     return {
       status: false,
@@ -165,20 +171,49 @@ export class AddSignatureComponent implements OnInit {
   }
 
   showModal(): void {
-    this.email = this.authService.getEmail();
-    
+    if (this.otpCountdown > 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: `Tunggu ${this.otpCountdown} detik untuk mengirim ulang OTP`,
+      });
+    } else {
+      this.sendOtp();
+    }
+    this.maskedEmail = this.maskEmail(this.email);
     this.otpModal = true;
   }
 
   hideModal(): void {
-    this.email = '';
-    this.otpModal = false;
-    console.log('OTP', this.otp);
+    const otpNumber = this.otp.toString().replaceAll(',', '');
 
-    const result = this.otp.map((i) => Number(i));
-    console.log(result);
+    const data = {
+      otp: otpNumber,
+    };
 
-    this.otp = this.otp.map(() => '');
+    this.approvalService
+      .verifOtp(Number(this.idApprover), data)
+      .pipe(
+        catchError((error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message,
+          });
+          return throwError(() => new Error('Error fetching'));
+        })
+      )
+      .subscribe(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'OTP berhasil dikirimkan',
+        });
+        this.otpModal = false;
+        this.email = '';
+        this.maskedEmail = '';
+        this.export();
+      });
   }
 
   onInput(event: any, index: number): void {
@@ -198,5 +233,49 @@ export class AddSignatureComponent implements OnInit {
     if (event.key === 'Backspace' && index > 0 && !this.otp[index]) {
       (event.target.previousElementSibling as HTMLInputElement).focus();
     }
+  }
+
+  private startOtpCountdown(): void {
+    this.otpCountdown = 60; // set countdown to 60 seconds
+    this.otpTimer = setInterval(() => {
+      this.otpCountdown--;
+      if (this.otpCountdown <= 0) {
+        clearInterval(this.otpTimer);
+      }
+    }, 1000);
+  }
+
+  sendOtp(): void {
+    this.email = this.authService.getEmail();
+    this.maskedEmail = this.maskEmail(this.email);
+    this.approvalService
+      .sendOtp(Number(this.idApprover))
+      .pipe(
+        catchError((error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: error.error.message,
+          });
+          return throwError(() => new Error('Error fetching'));
+        })
+      )
+      .subscribe((response: any) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'OTP sent successfully',
+        });
+        this.startOtpCountdown();
+      });
+  }
+
+  maskEmail(email: string): string {
+    const [localPart, domain] = email.split('@');
+    const visibleStart = localPart.slice(0, 3);
+    const visibleEnd = localPart.slice(-2);
+    const maskedPart =
+      localPart.length > 5 ? '*'.repeat(localPart.length - 5) : '';
+    return `${visibleStart}${maskedPart}${visibleEnd}@${domain}`;
   }
 }

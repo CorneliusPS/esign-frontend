@@ -23,28 +23,21 @@
           ></button>
           <button
             pButton
-            pRipple
+            type="button"
             label="Approve"
             icon="pi pi-check"
             class="p-button-success"
-            (click)="export()"
+            (click)="showModal()"
           ></button>
         </div>
-        <button
-          pButton
-          type="button"
-          label="Approve"
-          icon="pi pi-check"
-          class="p-button-success"
-          (click)="showModal()"
-        ></button>
       </div>
       <div *ngIf="pdfSrc" class="pdf-container mt-4">
         <div class="pdf-wrapper field form-group">
           <ngx-extended-pdf-viewer
+            #pdfViewer
             [src]="pdfSrc"
             [useBrowserLocale]="true"
-            [showToolbar]="true"
+            [customToolbar]="additionalButtons"
             class="shadow-4"
             [textLayer]="true"
             [showHandToolButton]="true"
@@ -52,6 +45,27 @@
           >
             ></ngx-extended-pdf-viewer
           >
+          <ng-template #additionalButtons>
+            <div id="toolbarViewer">
+              <div id="toolbarViewerLeft">
+                <pdf-toggle-sidebar></pdf-toggle-sidebar>
+                <div class="toolbarButtonSpacer"></div>
+                <pdf-find-button
+                  [showFindButton]="true"
+                  [textLayer]="true"
+                ></pdf-find-button>
+                <pdf-paging-area></pdf-paging-area>
+              </div>
+              <pdf-zoom-toolbar></pdf-zoom-toolbar>
+              <!-- toolbar viewer middle -->
+              <div id="toolbarViewerRight">
+                <pdf-editor></pdf-editor>
+                <pdf-download></pdf-download>
+                <div class="verticalToolbarSeparator hiddenSmallView"></div>
+                <pdf-toggle-secondary-toolbar></pdf-toggle-secondary-toolbar>
+              </div>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
@@ -60,18 +74,27 @@
       header="Konfirmasi"
       [(visible)]="otpModal"
       [modal]="true"
-      [style]="{ width: '25vw', height: '27vh' }"
-      [closable]="true"
+      [style]="{ maxWidth: '100vw', maxHeight: '35vh' }"
       [resizable]="false"
       class="confirmation-dialog"
     >
       <ng-template pTemplate="content">
         <div class="confirmation-content">
-          <label class="text-lg"
-            >Masukkan 6 digit kode yang dikirimkan ke email Anda. <br />
-            {{ email }}
+          <label class="text-lg">
+            Masukkan 6 digit kode yang dikirimkan ke email Anda. <br />
+            {{ maskedEmail }}
           </label>
 
+          <div *ngIf="otpCountdown > 0" class="my-2">
+            Tunggu {{ otpCountdown }} detik untuk mengirim ulang OTP.
+          </div>
+          <div *ngIf="otpCountdown === 0" class="my-3">
+            <button
+              pButton
+              label="Kirim Ulang OTP"
+              (click)="sendOtp()"
+            ></button>
+          </div>
           <div class="otp-container">
             <ng-container *ngFor="let ctrl of otpControls; let i = index">
               <input

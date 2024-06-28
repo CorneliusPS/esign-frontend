@@ -88,7 +88,7 @@
 
     <p-dialog
       [(visible)]="documentDialog"
-      header="Add Signature"
+      header="Add Request Signature"
       [modal]="true"
       [styleClass]="'p-grid p-fluid w-12 md:w-4'"
     >
@@ -214,9 +214,31 @@
           [useBrowserLocale]="true"
           class="shadow-4"
           [textLayer]="true"
+          [customToolbar]="additionalButtons"
           [showHandToolButton]="true"
           [height]="'70vh'"
         ></ngx-extended-pdf-viewer>
+
+        <ng-template #additionalButtons>
+          <div id="toolbarViewer">
+            <div id="toolbarViewerLeft">
+              <pdf-toggle-sidebar></pdf-toggle-sidebar>
+              <div class="toolbarButtonSpacer"></div>
+              <pdf-find-button
+                [showFindButton]="true"
+                [textLayer]="true"
+              ></pdf-find-button>
+              <pdf-paging-area></pdf-paging-area>
+            </div>
+            <pdf-zoom-toolbar></pdf-zoom-toolbar>
+            <!-- toolbar viewer middle -->
+            <div id="toolbarViewerRight">
+              <pdf-download></pdf-download>
+              <div class="verticalToolbarSeparator hiddenSmallView"></div>
+              <pdf-toggle-secondary-toolbar></pdf-toggle-secondary-toolbar>
+            </div>
+          </div>
+        </ng-template>
       </ng-template>
       <ng-template pTemplate="footer">
         <button
