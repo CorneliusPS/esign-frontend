@@ -44,17 +44,18 @@
               Signature Status <p-sortIcon field="approved"></p-sortIcon>
             </th>
             <th>Request By</th>
+            <th>Sign Date</th>
             <th>Approve Document</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data let-i="rowIndex">
           <tr>
             <td>{{ i + 1 }}</td>
-            <td style="width: 25%; min-width: 10rem">
+            <td style="width: 20%; min-width: 10rem">
               <span class="p-column-title">Document Name</span
               >{{ data.document.documentName }}
             </td>
-            <td style="width: 25%; min-width: 10rem">
+            <td style="width: 20%; min-width: 10rem">
               <span class="p-column-title">Status</span>
               <span [ngClass]="getStatusBadgeClass(data.approved)">{{
                 data.approved ? "signed" : "need sign"
@@ -64,6 +65,11 @@
               <span class="p-column-title">Request By</span>
               {{ data.document.uploadBy.username }}
             </td>
+            <td style="width: 20%; min-width: 10rem">
+              <span class="p-column-title">Sign Date</span>
+              {{ data.signedDate | date : "dd/MM/yyyy, HH:mm" }}
+            </td>
+
             <td>
               <div class="flex" *ngIf="!data.approved">
                 <button

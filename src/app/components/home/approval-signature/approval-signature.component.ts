@@ -57,11 +57,7 @@ export class ApprovalSignatureComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngAfterViewInit(): void {
-    this.loadDocuments();
-  }
-
-  ngOnInit(): void {
+    ngOnInit(): void {
     this.loadDocuments();
   }
 

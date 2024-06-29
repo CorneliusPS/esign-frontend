@@ -31,6 +31,7 @@ export class AddSignatureComponent implements OnInit {
   maskedEmail: string = '';
   otpCountdown: number = 0; // countdown timer
   otpTimer: any; // reference to the timer
+  isApproving: boolean = false; // Flag untuk menangani persetujuan bersamaan
 
   @Output() otpChange: EventEmitter<string> = new EventEmitter<string>();
 
@@ -134,7 +135,7 @@ export class AddSignatureComponent implements OnInit {
           summary: 'Success',
           detail: 'Document signed successfully',
         });
-        this.progressSpinnerVisible = true;
+
         // Menambahkan setTimeout untuk menunda navigasi
         setTimeout(() => {
           this.router.navigate(['/home/approvalsignature']);
@@ -185,6 +186,12 @@ export class AddSignatureComponent implements OnInit {
   }
 
   hideModal(): void {
+    if (this.isApproving) {
+      return; // Mencegah persetujuan ganda
+    }
+    this.isApproving = true; // Mengatur flag menjadi true untuk menandakan proses persetujuan sedang berlangsung
+
+    this.progressSpinnerVisible = true;
     const otpNumber = this.otp.toString().replaceAll(',', '');
 
     const data = {
@@ -200,6 +207,7 @@ export class AddSignatureComponent implements OnInit {
             summary: 'Error',
             detail: error.error.message,
           });
+          this.progressSpinnerVisible
           return throwError(() => new Error('Error fetching'));
         })
       )
@@ -212,7 +220,12 @@ export class AddSignatureComponent implements OnInit {
         this.otpModal = false;
         this.email = '';
         this.maskedEmail = '';
-        this.export();
+        setTimeout(() => {
+          this.export();
+        }, 500);
+      })
+      .add(() => {
+        this.isApproving = false; // Mengatur flag menjadi false setelah proses persetujuan selesai
       });
   }
 

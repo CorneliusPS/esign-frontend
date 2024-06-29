@@ -88,7 +88,7 @@ export class LoginComponent {
             this.messageService.add({
               severity: 'error',
               summary: 'Failed',
-              detail: 'Login Failed',
+              detail: error.error.message,
               life: 3000,
             });
             this.error = {
