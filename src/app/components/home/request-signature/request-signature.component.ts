@@ -133,36 +133,61 @@ export class RequestSignatureComponent implements OnInit {
   }
 
   saveDocument() {
-    this.export();
-    const formData = new FormData();
-
-    if (this.postDocument.fileData) {
-      formData.append('file', this.file);
-    }
-
-    this.documentService
-      .saveDocument(formData, this.postDocument.documentName)
-      .pipe(
-        catchError((error: HttpErrorResponse) => {
-          this.error = {
-            status: true,
-            message: error.message,
-            timestamp: Date.now(),
-          };
-          if (error.status == 401) {
-            this.error.message = 'Unauthorized';
-          }
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: this.error.message,
-          });
-          return throwError(() => new Error('Error saving document'));
-        })
-      )
-      .subscribe((response: any) => {
-        this.assignApprovers(response.data.idDocument);
+    this.submitted = true;
+    // lakukan pengcekan apakah documentName sudah diisi atau belum
+    if (!this.postDocument.documentName) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please fill the document name',
       });
+      // lakukan pengcekan apakah file sudah diupload atau belum
+    } else if (!this.postDocument.fileData) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please upload a file',
+      });
+      // lakukan pengcekan apakah selectedApprovers sudah diisi atau belum
+    } else if (this.selectedApprovers.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please select at least one approver',
+      });
+      // jika semua kondisi diatas terpenuhi, maka lakukan export dan save document
+    } else {
+      this.export();
+      const formData = new FormData();
+
+      if (this.postDocument.fileData) {
+        formData.append('file', this.file);
+      }
+
+      this.documentService
+        .saveDocument(formData, this.postDocument.documentName)
+        .pipe(
+          catchError((error: HttpErrorResponse) => {
+            this.error = {
+              status: true,
+              message: error.message,
+              timestamp: Date.now(),
+            };
+            if (error.status == 401) {
+              this.error.message = 'Unauthorized';
+            }
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: this.error.message,
+            });
+            return throwError(() => new Error('Error saving document'));
+          })
+        )
+        .subscribe((response: any) => {
+          this.assignApprovers(response.data.idDocument);
+        });
+    }
   }
 
   assignApprovers(idDocument: number) {
@@ -235,6 +260,7 @@ export class RequestSignatureComponent implements OnInit {
     this.documentDialog = false;
     this.submitted = false;
     this.postDocument = {};
+    this.selectedApprover = null;
   }
 
   hidePdfDialog(): void {

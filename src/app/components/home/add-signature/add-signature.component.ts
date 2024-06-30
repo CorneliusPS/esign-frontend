@@ -207,7 +207,7 @@ export class AddSignatureComponent implements OnInit {
             summary: 'Error',
             detail: error.error.message,
           });
-          this.progressSpinnerVisible
+          this.progressSpinnerVisible = false;
           return throwError(() => new Error('Error fetching'));
         })
       )

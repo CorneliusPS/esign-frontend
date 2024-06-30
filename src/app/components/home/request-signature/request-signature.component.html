@@ -54,8 +54,8 @@
             <th pSortableColumn="documentName">
               Document Name <p-sortIcon field="documentName"></p-sortIcon>
             </th>
-            <th pSortableColumn="status">
-              Status <p-sortIcon field="status"></p-sortIcon>
+            <th pSortableColumn="documentStatus">
+              Status <p-sortIcon field="documentStatus"></p-sortIcon>
             </th>
             <th pSortableColumn="signed">
               Signature Status <p-sortIcon field="signed"></p-sortIcon>
@@ -101,8 +101,18 @@
             name="documentName"
             type="text"
             pInputText
+            required
+            autofocus
             [(ngModel)]="postDocument.documentName"
+            [ngClass]="{
+              'ng-invalid ng-dirty': submitted && !postDocument.documentName
+            }"
           />
+          <small
+            class="ng-dirty ng-invalid"
+            *ngIf="submitted && !postDocument.documentName"
+            >Document Name is required.</small
+          >
         </div>
 
         <div class="field form-group">
