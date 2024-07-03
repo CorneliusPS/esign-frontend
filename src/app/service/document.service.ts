@@ -38,11 +38,11 @@ export class DocumentService {
   }
 
   //save document file pdf to endpoint /api/document/upload
-  saveDocument(formData: FormData, documentName?: string): Observable<any> {
+  saveDocument(formData: FormData, documentName?: string, approvalType?: string): Observable<any> {
     const headers = {
       Authorization: 'Bearer ' + this.authService.getToken(),
     };
-    return this.http.post(`${this.baseUrl}/api/document/upload?documentName=${documentName}`, formData, {
+    return this.http.post(`${this.baseUrl}/api/document/upload?documentName=${documentName}&approvalType=${approvalType}`, formData, {
       headers,
     });
   }
@@ -56,6 +56,17 @@ export class DocumentService {
     return this.http.post(
       `${this.baseUrl}/api/document/${idDocument}/assign-approvers/`,
       approverIds,
+      { headers }
+    );
+  }
+
+  getDocumentHistory(idDocument: number): Observable<IResponseList> {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + this.authService.getToken(),
+    };
+    return this.http.get<IResponseList>(
+      `${this.baseUrl}/api/document/log/${idDocument}`,
       { headers }
     );
   }

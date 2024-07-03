@@ -20,6 +20,7 @@ import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
 })
 export class RequestSignatureComponent implements OnInit {
   approvers: any[] = [];
+  approverType: string = 'PARALLEL';
   documentName: string = '';
   filteredApprovers: any[] = [];
   uploadForm: FormGroup | undefined;
@@ -40,6 +41,8 @@ export class RequestSignatureComponent implements OnInit {
   pdfSrc: any;
   blob: any;
   pdfDialog: boolean = false;
+  historyDialog: boolean = false;
+  documentHistory: any[] = [];
 
   constructor(
     private documentService: DocumentService,
@@ -165,7 +168,11 @@ export class RequestSignatureComponent implements OnInit {
       }
 
       this.documentService
-        .saveDocument(formData, this.postDocument.documentName)
+        .saveDocument(
+          formData,
+          this.postDocument.documentName,
+          this.approverType
+        )
         .pipe(
           catchError((error: HttpErrorResponse) => {
             this.error = {
@@ -311,11 +318,48 @@ export class RequestSignatureComponent implements OnInit {
       case true:
         return 'product-badge status-instock';
       case false:
-        return 'product-badge status-outofstock';
+        return 'product-badge status-lowstock';
       default:
         return '';
     }
   }
+
+  viewHistory(idDocument: number): void {
+    this.documentService
+      .getDocumentHistory(idDocument)
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          this.error = {
+            status: true,
+            message: error.message,
+            timestamp: Date.now(),
+          };
+          if (error.status == 401) {
+            this.authService.logout();
+          } else if (error.status == 404) {
+            this.documentHistory = [];
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: this.error.message,
+            });
+          }
+          return throwError(() => new Error('Error fetching document history'));
+        })
+      )
+      .subscribe((response: any) => {
+        this.documentHistory = response.data;
+        console.log(this.documentHistory);
+        this.historyDialog = true;
+      });
+  }
+
+  hideHistoryDialog(): void {
+    this.historyDialog = false;
+    this.documentHistory = [];
+  }
+
   private handleError(message: string, detail: string = ''): void {
     this.error = { status: true, message, timestamp: Date.now() };
     this.messageService.add({

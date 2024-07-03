@@ -94,6 +94,7 @@ export class AppMenuComponent implements OnInit {
             {
               label: 'List Request Approval',
               icon: 'pi pi-fw pi-inbox',
+              badge: '8',
               routerLink: ['/home/approvalsignature'],
             },
           ],

@@ -21,6 +21,7 @@ import { RequestSignatureRoutingModule } from './request-signature-routing.modul
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { UserService } from 'src/app/service/user.service';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { TimelineModule } from 'primeng/timeline';
 
 @NgModule({
   imports: [
@@ -43,6 +44,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     AutoCompleteModule,
     ChipsModule,
     NgxExtendedPdfViewerModule,
+    TimelineModule  
   ],
   declarations: [RequestSignatureComponent],
   providers: [DocumentService, UserService],

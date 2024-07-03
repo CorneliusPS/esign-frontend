@@ -55,31 +55,48 @@
               Document Name <p-sortIcon field="documentName"></p-sortIcon>
             </th>
             <th pSortableColumn="documentStatus">
-              Status <p-sortIcon field="documentStatus"></p-sortIcon>
+              Progress <p-sortIcon field="documentStatus"></p-sortIcon>
+            </th>
+            <th pSortableColumn="uploadDate">
+              Request Date <p-sortIcon field="uploadDate"></p-sortIcon>
             </th>
             <th pSortableColumn="signed">
               Signature Status <p-sortIcon field="signed"></p-sortIcon>
             </th>
+            <th>History</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-data let-i="rowIndex">
           <tr>
             <td>{{ i + 1 }}</td>
-            <td style="width: 33%; min-width: 10rem">
+            <td style="width: 25%; min-width: 10rem">
               <span class="p-column-title">Document Name</span>
               <a class="cursor-pointer" (click)="openPdfViewer(data)">{{
                 data.documentName
               }}</a>
             </td>
-            <td style="width: 33%; min-width: 10rem">
-              <span class="p-column-title">Status</span
+            <td style="width: 20%; min-width: 10rem">
+              <span class="p-column-title">Progress</span
               >{{ data.documentStatus }}
             </td>
-            <td style="width: 33%; min-width: 10rem">
+            <td style="width: 20%; min-width: 10rem">
+              <span class="p-column-title">Request Date</span>
+              {{ data.uploadDate | date : "dd/MM/yyyy, HH:mm" }}
+            </td>
+            <td style="width: 20%; min-width: 10rem">
               <span class="p-column-title">Signature Status</span>
               <span [ngClass]="getStatusBadgeClass(data.signed)">
-                {{ data.signed ? "signed" : "not signed" }}
+                {{ data.signed ? "signed" : "progress" }}
               </span>
+            </td>
+            <td style="width: 20%; min-width: 10 rem">
+              <button
+                pButton
+                class="p-button-success mr-2"
+                label="View History"
+                icon="pi pi-clock"
+                (click)="viewHistory(data.idDocument)"
+              ></button>
             </td>
           </tr>
         </ng-template>
@@ -90,6 +107,8 @@
       [(visible)]="documentDialog"
       header="Add Request Signature"
       [modal]="true"
+      [draggable]="false"
+      [closable]="true"
       [styleClass]="'p-grid p-fluid w-12 md:w-4'"
     >
       <ng-template pTemplate="content">
@@ -145,6 +164,19 @@
               ></ngx-extended-pdf-viewer
             >
           </div>
+        </div>
+
+        <div class="field form-group">
+          <label for="approverType" class="font-semibold">Approver Type</label>
+          <div class="mt-1"></div>
+          <p-dropdown
+            id="approverType"
+            [options]="[
+              { label: 'Parallel', value: 'PARALLEL' },
+              { label: 'Serial', value: 'SERIAL' }
+            ]"
+            [(ngModel)]="approverType"
+          ></p-dropdown>
         </div>
 
         <div class="field form-group mt-2">
@@ -217,6 +249,7 @@
       [modal]="true"
       [styleClass]="'p-grid p-fluid w-12 md:w-4'"
       [closable]="true"
+      [draggable]="false"
     >
       <ng-template pTemplate="content">
         <ngx-extended-pdf-viewer
@@ -258,6 +291,52 @@
           icon="pi pi-times"
           class="p-button-text"
           (click)="hidePdfDialog()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- History Modal -->
+    <p-dialog
+      [(visible)]="historyDialog"
+      header="Document History"
+      [modal]="true"
+      [styleClass]="'w-50'"
+      [closable]="true"
+      [draggable]="false"
+    >
+      <ng-template pTemplate="content">
+        <div *ngIf="documentHistory.length > 0; else noHistory">
+          <p-timeline
+            [value]="documentHistory"
+            align="left"
+            class="customized-timeline"
+          >
+            <ng-template pTemplate="opposite" let-history>
+              <div class="p-text-secondary">
+                {{ history.timestamp | date : "dd/MM/yyyy, HH:mm" }}
+              </div>
+            </ng-template>
+            <ng-template pTemplate="content" let-history>
+              <div class="p-card p-shadow-4 p-1">
+                <p>{{ history.description }}</p>
+              </div>
+            </ng-template>
+          </p-timeline>
+        </div>
+        <ng-template #noHistory>
+          <div class="p-text-center">
+            No history available for this document.
+          </div>
+        </ng-template>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Close"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="hideHistoryDialog()"
         ></button>
       </ng-template>
     </p-dialog>

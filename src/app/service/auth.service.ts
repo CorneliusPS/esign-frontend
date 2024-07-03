@@ -102,6 +102,7 @@ export class AuthService {
   }
 
   logout() {
+    localStorage.removeItem('email');
     localStorage.removeItem(this.keyToken);
     localStorage.removeItem('rl');
     this.isLoggedIn = false;
