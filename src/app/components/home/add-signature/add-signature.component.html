@@ -29,6 +29,13 @@
             class="p-button-success"
             (click)="showModal()"
           ></button>
+
+          <!-- <button
+            pButton
+            type="button"
+            label="Add Text"
+            (click)="addTextEditor()"
+          ></button> -->
         </div>
       </div>
       <div *ngIf="pdfSrc" class="pdf-container mt-4">
@@ -36,12 +43,11 @@
           <ngx-extended-pdf-viewer
             #pdfViewer
             [src]="pdfSrc"
-            [useBrowserLocale]="true"
             [customToolbar]="additionalButtons"
             class="shadow-4"
             [textLayer]="true"
             [showHandToolButton]="true"
-            [height]="'100vh'"
+            [height]="'90vh'"
           >
             ></ngx-extended-pdf-viewer
           >

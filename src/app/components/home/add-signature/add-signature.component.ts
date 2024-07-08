@@ -7,7 +7,10 @@ import { IError } from 'src/app/interfaces/i-error';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MessageService } from 'primeng/api';
-import { NgxExtendedPdfViewerService } from 'ngx-extended-pdf-viewer';
+import {
+  FreeTextEditorAnnotation,
+  NgxExtendedPdfViewerService,
+} from 'ngx-extended-pdf-viewer';
 
 @Component({
   selector: 'app-add-signature',
@@ -217,6 +220,13 @@ export class AddSignatureComponent implements OnInit {
           summary: 'Success',
           detail: 'OTP berhasil dikirimkan',
         });
+
+        if (
+          this.data.document.numberOfApprovers === this.data.document.flagCount
+        ) {
+          this.addTextEditor();
+        }
+
         this.otpModal = false;
         this.email = '';
         this.maskedEmail = '';
@@ -290,5 +300,25 @@ export class AddSignatureComponent implements OnInit {
     const maskedPart =
       localPart.length > 5 ? '*'.repeat(localPart.length - 5) : '';
     return `${visibleStart}${maskedPart}${visibleEnd}@${domain}`;
+  }
+
+  public addTextEditor(): void {
+    const textEditorAnnotation: FreeTextEditorAnnotation = {
+      annotationType: 3,
+      color: [0, 0, 0],
+      fontSize: 16,
+      value: `ID Doc: ${this.data.document.documentSign}`,
+      pageIndex: this.pdfViewerService.numberOfPages() - 1,
+
+      rect: [
+        50, // height?
+        0, // y
+        590, // x
+        600, // width?
+      ],
+      rotation: 270,
+    };
+
+    this.pdfViewerService.addEditorAnnotation(textEditorAnnotation);
   }
 }

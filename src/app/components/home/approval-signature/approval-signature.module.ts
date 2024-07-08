@@ -21,6 +21,7 @@ import { ApprovalSignatureRoutingModule } from './approval-signature-routing.mod
 import { ApprovalSignatureComponent } from './approval-signature.component';
 import { ApprovalService } from 'src/app/service/approval.service';
 import { AngularSignaturePadModule } from '@almothafar/angular-signature-pad';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { AngularSignaturePadModule } from '@almothafar/angular-signature-pad';
     DialogModule,
     AutoCompleteModule,
     AngularSignaturePadModule,
+    NgxExtendedPdfViewerModule,
   ],
   declarations: [ApprovalSignatureComponent],
   providers: [DocumentService, UserService, ApprovalService],

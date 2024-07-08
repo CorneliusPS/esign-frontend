@@ -243,6 +243,7 @@
       </ng-template>
     </p-dialog>
 
+    <!--View Pdf Dialog-->
     <p-dialog
       [(visible)]="pdfDialog"
       header="Preview Document"
@@ -256,9 +257,10 @@
           [src]="pdfSrc"
           [useBrowserLocale]="true"
           class="shadow-4"
-          [textLayer]="true"
+          [textLayer]="false"
           [customToolbar]="additionalButtons"
-          [showHandToolButton]="true"
+          [showHandToolButton]="false"
+          [handTool]="false"
           [height]="'70vh'"
         ></ngx-extended-pdf-viewer>
 

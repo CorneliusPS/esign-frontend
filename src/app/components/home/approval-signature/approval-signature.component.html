@@ -52,8 +52,11 @@
           <tr>
             <td>{{ i + 1 }}</td>
             <td style="width: 20%; min-width: 10rem">
-              <span class="p-column-title">Document Name</span
-              >{{ data.document.documentName }}
+              <a
+                class="cursor-pointer"
+                (click)="openPdfViewer(data.document)"
+                >{{ data.document.documentName }}</a
+              >
             </td>
             <td style="width: 20%; min-width: 10rem">
               <span class="p-column-title">Status</span>
@@ -86,5 +89,56 @@
         </ng-template>
       </p-table>
     </div>
+
+    <!--View Pdf Dialog-->
+    <p-dialog
+      [(visible)]="pdfDialog"
+      header="Preview Document"
+      [modal]="true"
+      [styleClass]="'p-grid p-fluid w-12 md:w-4'"
+      [closable]="true"
+      [draggable]="false"
+    >
+      <ng-template pTemplate="content">
+        <ngx-extended-pdf-viewer
+          [src]="pdfSrc"
+          [useBrowserLocale]="true"
+          class="shadow-4"
+          [customToolbar]="additionalButtons"
+          [height]="'70vh'"
+        ></ngx-extended-pdf-viewer>
+
+        <ng-template #additionalButtons>
+          <div id="toolbarViewer">
+            <div id="toolbarViewerLeft">
+              <pdf-toggle-sidebar></pdf-toggle-sidebar>
+              <div class="toolbarButtonSpacer"></div>
+              <pdf-find-button
+                [showFindButton]="true"
+                [textLayer]="true"
+              ></pdf-find-button>
+              <pdf-paging-area></pdf-paging-area>
+            </div>
+            <pdf-zoom-toolbar></pdf-zoom-toolbar>
+            <!-- toolbar viewer middle -->
+            <div id="toolbarViewerRight">
+              <pdf-download></pdf-download>
+              <div class="verticalToolbarSeparator hiddenSmallView"></div>
+              <pdf-toggle-secondary-toolbar></pdf-toggle-secondary-toolbar>
+            </div>
+          </div>
+        </ng-template>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          pRipple
+          label="Close"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="hidePdfDialog()"
+        ></button>
+      </ng-template>
+    </p-dialog>
   </div>
 </div>
