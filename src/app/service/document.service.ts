@@ -70,4 +70,15 @@ export class DocumentService {
       { headers }
     );
   }
+
+  getAllDocumentSigned(): Observable<IResponseList> {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + this.authService.getToken(),
+    };
+    return this.http.get<IResponseList>(
+      `${this.baseUrl}/api/document/get-all-signed`,
+      { headers }
+    );
+  }
 }

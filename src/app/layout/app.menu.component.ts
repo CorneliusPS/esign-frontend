@@ -99,6 +99,16 @@ export class AppMenuComponent implements OnInit {
             },
           ],
         },
+        {
+          label: 'Data Inquery',
+          items: [
+            {
+              label: 'Inquery Document Signed',
+              icon: 'pi pi-fw pi-file',
+              routerLink: ['/home/document-signed'],
+            },
+          ],
+        },
       ];
     }
   }

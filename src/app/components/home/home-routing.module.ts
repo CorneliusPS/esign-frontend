@@ -33,6 +33,14 @@ import { RouterModule } from '@angular/router';
             (m) => m.AddSignatureModule
           ),
       },
+      {
+        path: 'document-signed',
+        data: { breadcrumb: 'Inquery Document Signed' },
+        loadChildren: () =>
+          import('./document-signed/document-signed.module').then(
+            (m) => m.DocumentSignedModule
+          ),
+      },
       { path: '**', redirectTo: '/notfound' },
     ]),
   ],
